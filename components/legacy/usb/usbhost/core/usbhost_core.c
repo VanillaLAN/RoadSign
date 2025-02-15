@@ -12,7 +12,7 @@
 #include <drivers/usb_host.h>
 
 #define DBG_TAG    "usbhost.core"
-#define DBG_LVL           DBG_INFO
+#define DBG_LVL           DBG_LOG//DBG_INFO
 #include <rtdbg.h>
 
 static struct uinstance dev[USB_MAX_DEVICE];
@@ -315,7 +315,7 @@ rt_err_t rt_usbh_get_descriptor(uinst_t device, rt_uint8_t type, void* buffer,
     int nbytes)
 {
     struct urequest setup;
-    int timeout = USB_TIMEOUT_BASIC;
+    int timeout = RT_TICK_PER_SECOND*5;//USB_TIMEOUT_BASIC;
 
     RT_ASSERT(device != RT_NULL);
 

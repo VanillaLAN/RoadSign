@@ -1,7 +1,7 @@
 /**
   **************************************************************************
-  * @file     at32f435_437_clock.h
-  * @brief    header file of clock program
+  * @file     usbd_sdr.h
+  * @brief    usb standard request header file
   **************************************************************************
   *                       Copyright notice & Disclaimer
   *
@@ -23,18 +23,40 @@
   */
 
 /* define to prevent recursive inclusion -------------------------------------*/
-#ifndef __AT32F435_437_CLOCK_H
-#define __AT32F435_437_CLOCK_H
+#ifndef __USBD_SDR_H
+#define __USBD_SDR_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* includes ------------------------------------------------------------------*/
-#include "at32f435_437.h"
+#include "usbd_core.h"
 
-/* exported functions ------------------------------------------------------- */
-void system_clock_config(void);
+/** @addtogroup USBD_drivers_standard_request
+  * @{
+  */
+
+/** @defgroup USBD_sdr_exported_functions
+  * @{
+  */
+
+#ifdef BSP_USING_USBD
+
+void usbd_setup_request_parse(usb_setup_type *setup, uint8_t *buf);
+usb_sts_type usbd_device_request(usbd_core_type *udev);
+usb_sts_type usbd_interface_request(usbd_core_type *udev);
+usb_sts_type usbd_endpoint_request(usbd_core_type *udev);
+
+#endif
+
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */
 
 #ifdef __cplusplus
 }

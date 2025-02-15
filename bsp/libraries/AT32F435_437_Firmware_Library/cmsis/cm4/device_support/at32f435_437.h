@@ -1,8 +1,8 @@
 /**
   **************************************************************************
   * @file     at32f435_437.h
-  * @version  v2.0.7
-  * @date     2022-04-02
+  * @version  v2.0.8
+  * @date     2022-04-25
   * @brief    at32f435_437 header file
   **************************************************************************
   *                       Copyright notice & Disclaimer
@@ -43,9 +43,7 @@ extern "C" {
 /** @addtogroup AT32F435_437
   * @{
   */
-#ifndef AT32F437VGT7
-#define AT32F437VGT7
-#endif
+
 /** @addtogroup Library_configuration_section
   * @{
   */
@@ -83,99 +81,6 @@ extern "C" {
     #define AT32F437xx
 #endif
 
-/**
-  * define with package
-  */
-#if defined (AT32F435ZCT7) || defined (AT32F435ZGT7) || defined (AT32F435ZMT7) || \
-    defined (AT32F435ZDT7)
-
-    #define AT32F435Zx
-#endif
-
-#if defined (AT32F435VCT7) || defined (AT32F435VGT7) || defined (AT32F435VMT7) || \
-    defined (AT32F435VDT7)
-
-    #define AT32F435Vx
-#endif
-
-#if defined (AT32F435RCT7) || defined (AT32F435RGT7) || defined (AT32F435RMT7) || \
-    defined (AT32F435RDT7)
-
-    #define AT32F435Rx
-#endif
-
-#if defined (AT32F435CCU7) || defined (AT32F435CGU7) || defined (AT32F435CMU7) || \
-    defined (AT32F435CCT7) || defined (AT32F435CGT7) || defined (AT32F435CMT7) || \
-    defined (AT32F435CDU7) || defined (AT32F435CDT7)
-
-    #define AT32F435Cx
-#endif
-
-#if defined (AT32F437ZCT7) || defined (AT32F437ZGT7) || defined (AT32F437ZMT7) || \
-    defined (AT32F437ZDT7)
-
-    #define AT32F437Zx
-#endif
-
-#if defined (AT32F437VCT7) || defined (AT32F437VGT7) || defined (AT32F437VMT7) || \
-    defined (AT32F437VDT7)
-
-    #define AT32F437Vx
-#endif
-
-#if defined (AT32F437RCT7) || defined (AT32F437RGT7) || defined (AT32F437RMT7) || \
-    defined (AT32F437RDT7)
-
-    #define AT32F437Rx
-#endif
-
-/**
-  * define with memory density
-  */
-#if defined (AT32F435CCU7) || defined (AT32F435CCT7) || defined (AT32F435RCT7) || \
-    defined (AT32F435VCT7) || defined (AT32F435ZCT7)
-
-    #define AT32F435xC
-#endif
-
-#if defined (AT32F435CDU7) || defined (AT32F435CDT7) || defined (AT32F435RDT7) || \
-    defined (AT32F435VDT7) || defined (AT32F435ZDT7)
-
-    #define AT32F435xD
-#endif
-
-#if defined (AT32F435CGU7) || defined (AT32F435CGT7) || defined (AT32F435RGT7) || \
-    defined (AT32F435VGT7) || defined (AT32F435ZGT7)
-
-    #define AT32F435xG
-#endif
-
-#if defined (AT32F435CMU7) || defined (AT32F435CMT7) || defined (AT32F435RMT7) || \
-    defined (AT32F435VMT7) || defined (AT32F435ZMT7)
-
-    #define AT32F435xM
-#endif
-
-#if defined (AT32F437RCT7) || defined (AT32F437VCT7) || defined (AT32F437ZCT7)
-
-    #define AT32F437xC
-#endif
-
-#if defined (AT32F437RDT7) || defined (AT32F437VDT7) || defined (AT32F437ZDT7)
-
-    #define AT32F437xD
-#endif
-
-#if defined (AT32F437RGT7) || defined (AT32F437VGT7) || defined (AT32F437ZGT7)
-
-    #define AT32F437xG
-#endif
-
-#if defined (AT32F437RMT7) || defined (AT32F437VMT7) || defined (AT32F437ZMT7)
-
-    #define AT32F437xM
-#endif
-
 #ifndef USE_STDPERIPH_DRIVER
 /**
   * @brief comment the line below if you will not use the peripherals drivers.
@@ -195,7 +100,7 @@ extern "C" {
   */
 #define __AT32F435_437_LIBRARY_VERSION_MAJOR    (0x02) /*!< [31:24] major version */
 #define __AT32F435_437_LIBRARY_VERSION_MIDDLE   (0x00) /*!< [23:16] middle version */
-#define __AT32F435_437_LIBRARY_VERSION_MINOR    (0x07) /*!< [15:8]  minor version */
+#define __AT32F435_437_LIBRARY_VERSION_MINOR    (0x08) /*!< [15:8]  minor version */
 #define __AT32F435_437_LIBRARY_VERSION_RC       (0x00) /*!< [7:0]  release candidate */
 #define __AT32F435_437_LIBRARY_VERSION          ((__AT32F435_437_LIBRARY_VERSION_MAJOR << 24)  | \
                                                  (__AT32F435_437_LIBRARY_VERSION_MIDDLE << 16) | \

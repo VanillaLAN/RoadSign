@@ -175,7 +175,7 @@
 #define RT_USING_SERIAL
 #define RT_USING_SERIAL_V1
 #define RT_SERIAL_USING_DMA
-#define RT_SERIAL_RB_BUFSZ 256
+#define RT_SERIAL_RB_BUFSZ 1024//256
 #define RT_USING_PIN
 /* end of Device Drivers */
 
@@ -284,6 +284,9 @@
 #define RT_USBH_MSTORAGE
 #define UDISK_MOUNTPOINT "/"
 #define RT_USBD_THREAD_STACK_SZ 4096
+
+#define RT_USBH_RNDIS
+#define RT_USBH_RNDIS_DEV
 /* end of Using USB legacy version */
 /* end of RT-Thread Components */
 

@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
   * @file     startup_at32f435_437.s
-  * @version  v2.0.7
-  * @date     2022-04-02
+  * @version  v2.0.8
+  * @date     2022-04-25
   * @brief    at32f435_437 devices vector table for gcc toolchain.
   *           this module performs:
   *           - set the initial sp
@@ -83,7 +83,7 @@ LoopFillZerobss:
 /* Call the clock system intitialization function.*/
   bl  SystemInit
 /* Call static constructors */
-//  bl __libc_init_array
+  bl __libc_init_array
 /* Call the application's entry point.*/
   bl  entry
   bx  lr

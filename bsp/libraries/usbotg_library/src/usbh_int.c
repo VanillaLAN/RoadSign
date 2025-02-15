@@ -280,16 +280,26 @@ void usbh_hch_in_handler(usbh_core_type *uhost, uint8_t chn)
       {
         uhost->urb_state[chn] = URB_NOTREADY;
       }
+			
+			/* re-activate the channel  */
       usb_chh->hcchar_bit.chdis = FALSE;
       usb_chh->hcchar_bit.chena = TRUE;
     }
     else if(uhost->hch[chn].state == HCH_NAK)
     {
-      usb_chh->hcchar_bit.chdis = FALSE;
+      /* re-activate the channel  */
+			usb_chh->hcchar_bit.chdis = FALSE;
       usb_chh->hcchar_bit.chena = TRUE;
       uhost->urb_state[chn] = URB_NOTREADY;
 //      rt_kprintf("IN %d  Nak re acktive\n", chn);
     }
+		else
+		{
+			/* this usb urb_state is idle, re-activate the channel. 
+         use the L501C 4D0103 test enter there, L501C 2B0402 no enter zhaoshimin 20211120*/
+      usb_chh->hcchar_bit.chdis = FALSE;
+      usb_chh->hcchar_bit.chena = TRUE;
+		}
     usb_chh->hcint = USB_OTG_HC_CHHLTD_FLAG;
     usbd_notify_urbchange_callback(uhost, chn, uhost->urb_state[chn]);
   }

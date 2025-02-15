@@ -191,6 +191,7 @@ ucd_t rt_usbh_class_driver_find(int class_code, int subclass_code);
 /* usb class driver implement */
 ucd_t rt_usbh_class_driver_hub(void);
 ucd_t rt_usbh_class_driver_storage(void);
+ucd_t rt_usbh_class_driver_rndis(void);
 
 
 

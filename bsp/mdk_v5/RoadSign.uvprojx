@@ -953,11 +953,6 @@
               <FilePath>..\..\src\scheduler_up.c</FilePath>
             </File>
             <File>
-              <FileName>signal.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\src\signal.c</FilePath>
-            </File>
-            <File>
               <FileName>thread.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\src\thread.c</FilePath>
@@ -972,6 +967,11 @@
         <Group>
           <GroupName>libc</GroupName>
           <Files>
+            <File>
+              <FileName>syscall_mem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\components\libc\compilers\armlibc\syscall_mem.c</FilePath>
+            </File>
             <File>
               <FileName>syscalls.c</FileName>
               <FileType>1</FileType>

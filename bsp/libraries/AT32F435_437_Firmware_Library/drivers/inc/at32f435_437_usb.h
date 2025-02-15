@@ -374,7 +374,7 @@ typedef enum
   * @brief usb channel max num define
   */
 #ifndef USB_HOST_CHANNEL_NUM
-#define USB_HOST_CHANNEL_NUM             8//16 /*!< usb host support channel number */
+#define USB_HOST_CHANNEL_NUM             16 /*!< usb host support channel number */
 #endif
 
 /**
