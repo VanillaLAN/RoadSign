@@ -28,6 +28,8 @@ if RT_USING_CHERRYUSB
                 bool "CUSTOM (Implement it yourself)"
             config RT_CHERRYUSB_DEVICE_FSDEV
                 bool "fsdev"
+            config RT_CHERRYUSB_DEVICE_DWC2_AT
+                bool "dwc2_at"
             config RT_CHERRYUSB_DEVICE_DWC2_ST
                 bool "dwc2_st"
             config RT_CHERRYUSB_DEVICE_DWC2_ESP
@@ -180,6 +182,8 @@ if RT_USING_CHERRYUSB
                 bool "ehci_ma35d0"
             config RT_CHERRYUSB_HOST_EHCI_CUSTOM
                 bool "ehci_custom"
+            config RT_CHERRYUSB_HOST_DWC2_AT
+                bool "dwc2_at"
             config RT_CHERRYUSB_HOST_DWC2_ST
                 bool "dwc2_st"
             config RT_CHERRYUSB_HOST_DWC2_ESP

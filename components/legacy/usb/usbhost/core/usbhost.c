@@ -64,11 +64,6 @@ rt_err_t rt_usb_host_init(const char *name)
     }
 #endif
 #endif
-#ifdef RT_USBH_RNDIS
-    /* register mass storage class driver */
-//    drv = rt_usbh_class_driver_rndis();
-//    rt_usbh_class_driver_register(drv);
-#endif
 
     /* register hub class driver */
     drv = rt_usbh_class_driver_hub();

@@ -199,7 +199,7 @@
  * interrupt context!
  */
 #if !defined LWIP_TCPIP_CORE_LOCKING_INPUT || defined __DOXYGEN__
-#define LWIP_TCPIP_CORE_LOCKING_INPUT   0
+#define LWIP_TCPIP_CORE_LOCKING_INPUT   1
 #endif
 
 /**

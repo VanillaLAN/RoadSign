@@ -478,11 +478,11 @@ int usb_hc_init(struct usbh_bus *bus)
 
     USB_LOG_INFO("dwc2 has %d channels and dfifo depth(32-bit words) is %d\r\n", ((USB_OTG_GLB->GHWCFG2 & (0x0f << 14)) >> 14) + 1, (USB_OTG_GLB->GHWCFG3 >> 16));
 
-    if (((USB_OTG_GLB->GHWCFG2 & (0x3U << 3)) >> 3) != 2) {
-        USB_LOG_ERR("This dwc2 version does not support dma mode, so stop working\r\n");
-        while (1) {
-        }
-    }
+//    if (((USB_OTG_GLB->GHWCFG2 & (0x3U << 3)) >> 3) != 2) {
+//        USB_LOG_ERR("This dwc2 version does not support dma mode, so stop working\r\n");
+//        while (1) {
+//        }
+//    }
 
     if ((CONFIG_USB_DWC2_RX_FIFO_SIZE + CONFIG_USB_DWC2_NPTX_FIFO_SIZE + CONFIG_USB_DWC2_PTX_FIFO_SIZE) > (USB_OTG_GLB->GHWCFG3 >> 16)) {
         USB_LOG_ERR("Your fifo config is overflow, please check\r\n");
@@ -529,7 +529,7 @@ int usb_hc_init(struct usbh_bus *bus)
 
     USB_OTG_GLB->GAHBCFG &= ~USB_OTG_GAHBCFG_HBSTLEN;
     USB_OTG_GLB->GAHBCFG |= USB_OTG_GAHBCFG_HBSTLEN_4;
-    USB_OTG_GLB->GAHBCFG |= USB_OTG_GAHBCFG_DMAEN;
+//    USB_OTG_GLB->GAHBCFG |= USB_OTG_GAHBCFG_DMAEN;
 
     /* Enable interrupts matching to the Host mode ONLY */
     USB_OTG_GLB->GINTMSK |= (USB_OTG_GINTMSK_PRTIM | USB_OTG_GINTMSK_HCIM |
