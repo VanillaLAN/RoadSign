@@ -12,7 +12,7 @@
 #include <drivers/usb_host.h>
 
 #define DBG_TAG    "usbhost.core"
-#define DBG_LVL           DBG_INFO
+#define DBG_LVL           DBG_LOG//DBG_INFO
 #include <rtdbg.h>
 
 static struct uinstance dev[USB_MAX_DEVICE];
@@ -88,11 +88,12 @@ static struct uendpoint_descriptor ep0_in_desc =
 };
 rt_err_t rt_usbh_attatch_instance(uinst_t device)
 {
-    int i = 0;
+    int i = 0, j = 0;
     rt_err_t ret = RT_EOK;
     struct uconfig_descriptor cfg_desc;
     udev_desc_t dev_desc;
     uintf_desc_t intf_desc;
+	uiad_desc_t  iad_desc = RT_NULL;
     uep_desc_t ep_desc;
     rt_uint8_t ep_index;
     upipe_t pipe;
@@ -118,11 +119,12 @@ rt_err_t rt_usbh_attatch_instance(uinst_t device)
         rt_kprintf("get device descriptor head failed\n");
         return ret;
     }
-
+#if 0
     /* reset bus */
     rt_usbh_hub_reset_port(device->parent_hub, device->port);
     rt_thread_delay(2);
     rt_usbh_hub_clear_port_feature(device->parent_hub, i + 1, PORT_FEAT_C_CONNECTION);
+#endif
     /* set device address */
     ret = rt_usbh_set_address(device);
     if(ret != RT_EOK)
@@ -145,6 +147,7 @@ rt_err_t rt_usbh_attatch_instance(uinst_t device)
     LOG_D("get device descriptor length %d",
                                 dev_desc->bLength);
 
+	rt_thread_delay(2);
     /* get full device descriptor again */
     ret = rt_usbh_get_descriptor(device, USB_DESC_TYPE_DEVICE, (void*)dev_desc, dev_desc->bLength);
     if(ret != RT_EOK)
@@ -187,68 +190,135 @@ rt_err_t rt_usbh_attatch_instance(uinst_t device)
     {
         return ret;
     }
-    for(i=0; i<device->cfg_desc->bNumInterfaces; i++)
+    for(i=0; i<device->cfg_desc->bNumInterfaces; )
     {
-        /* get interface descriptor through configuration descriptor */
-        ret = rt_usbh_get_interface_descriptor(device->cfg_desc, i, &intf_desc);
-        if(ret != RT_EOK)
-        {
-            rt_kprintf("rt_usb_get_interface_descriptor error\n");
-            return -RT_ERROR;
-        }
+        /* get IAD descriptor through configuration descriptor */
+        ret = rt_usbh_get_IAD_descriptor(device->cfg_desc, i, &iad_desc);
+        
+		if(ret == RT_EOK)
+		{
+			for(j = iad_desc->bFirstInterface; j < (iad_desc->bInterfaceCount + iad_desc->bFirstInterface); j++)
+			{
+				/* find the IAD, get interface descriptor through configuration descriptor */
+				ret = rt_usbh_get_interface_descriptor(device->cfg_desc, j, &intf_desc);
+				i++;
+				if(ret != RT_EOK)
+				{
+					rt_kprintf("rt_usb_get_interface_descriptor error\n");
+					return -RT_ERROR;
+				}
 
-        LOG_D("interface class 0x%x, subclass 0x%x",
-                                    intf_desc->bInterfaceClass,
-                                    intf_desc->bInterfaceSubClass);
-        /* alloc pipe*/
-        for(ep_index = 0; ep_index < intf_desc->bNumEndpoints; ep_index++)
-        {
-            rt_usbh_get_endpoint_descriptor(intf_desc, ep_index, &ep_desc);
-            if(ep_desc != RT_NULL)
-            {
-                if(rt_usb_hcd_alloc_pipe(device->hcd, &pipe, device, ep_desc) != RT_EOK)
-                {
-                    rt_kprintf("alloc pipe failed\n");
-                    return -RT_ERROR;
-                }
-                rt_usb_instance_add_pipe(device,pipe);
-            }
-            else
-            {
-                rt_kprintf("get endpoint desc failed\n");
-                return -RT_ERROR;
-            }
-        }
-        /* find driver by class code found in interface descriptor */
-        drv = rt_usbh_class_driver_find(intf_desc->bInterfaceClass,
-            intf_desc->bInterfaceSubClass);
+				LOG_D("interface class 0x%x, subclass 0x%x",
+					intf_desc->bInterfaceClass,
+					intf_desc->bInterfaceSubClass);
+				/* alloc pipe*/
+				for(ep_index = 0; ep_index < intf_desc->bNumEndpoints; ep_index++)
+				{
+					rt_usbh_get_endpoint_descriptor(intf_desc, ep_index, &ep_desc);
+					if(ep_desc != RT_NULL)
+					{
+						if(rt_usb_hcd_alloc_pipe(device->hcd, &pipe, device, ep_desc) != RT_EOK)
+						{
+							rt_kprintf("alloc pipe failed\n");
+							return -RT_ERROR;
+						}
+						rt_usb_instance_add_pipe(device,pipe);
+					}
+					else
+					{
+						rt_kprintf("get endpoint desc failed\n");
+						return -RT_ERROR;
+					}
+				}
 
-        if(drv != RT_NULL)
-        {
-            /* allocate memory for interface device */
-            device->intf[i] = (struct uhintf*)rt_malloc(sizeof(struct uhintf));
-            if(device->intf[i] == RT_NULL)
-            {
-                return -RT_ENOMEM;
-            }
-            device->intf[i]->drv = drv;
-            device->intf[i]->device = device;
-            device->intf[i]->intf_desc = intf_desc;
-            device->intf[i]->user_data = RT_NULL;
+				/* allocate memory for interface device */
+				device->intf[j] = (struct uhintf*)rt_malloc(sizeof(struct uhintf));
+				device->intf[j]->drv = RT_NULL;
+				device->intf[j]->device = device;
+				device->intf[j]->intf_desc = intf_desc;
+				device->intf[j]->user_data = RT_NULL;
+			}
 
-            /* open usb class driver */
-            ret = rt_usbh_class_driver_enable(drv, (void*)device->intf[i]);
-            if(ret != RT_EOK)
-            {
-                rt_kprintf("interface %d run class driver error\n", i);
-            }
-        }
-        else
-        {
-            rt_kprintf("find usb device driver failed\n");
-            continue;
-        }
-    }
+			/* find driver by class code found in interface descriptor */
+			drv = rt_usbh_class_driver_find(iad_desc->bFunctionClass, 
+				iad_desc->bFunctionSubClass);
+
+			if(drv != RT_NULL)
+			{
+				/* open usb class driver */
+				j = iad_desc->bFirstInterface;
+				device->intf[j]->drv = drv;
+
+				ret = rt_usbh_class_driver_enable(drv, (void*)&device->intf[j]);rt_kprintf("usb class driver enable\n");
+				if(ret != RT_EOK)
+				{
+					rt_kprintf("interface %d run class driver error\n", j);
+				}
+			}
+			else
+			{
+				rt_kprintf("find usb device driver failed\n");
+			}
+		}
+		else
+		{
+			/* no IAD descriptor, get interface descriptor through configuration descriptor */
+			ret = rt_usbh_get_interface_descriptor(device->cfg_desc, i, &intf_desc);
+			if(ret != RT_EOK)
+			{
+				rt_kprintf("rt_usb_get_interface_descriptor error\n");
+				return -RT_ERROR;
+			}
+
+			LOG_D("interface class 0x%x, subclass 0x%x\n", 
+				intf_desc->bInterfaceClass,
+				intf_desc->bInterfaceSubClass);
+			/* alloc pipe*/
+			for(ep_index = 0; ep_index < intf_desc->bNumEndpoints; ep_index++)
+			{
+				rt_usbh_get_endpoint_descriptor(intf_desc, ep_index, &ep_desc);
+				if(ep_desc != RT_NULL)
+				{
+					if(rt_usb_hcd_alloc_pipe(device->hcd, &pipe, device, ep_desc) != RT_EOK)
+					{
+						rt_kprintf("alloc pipe failed\n");
+						return RT_ERROR;
+					}
+					rt_usb_instance_add_pipe(device,pipe);
+				}
+				else
+				{
+					rt_kprintf("get endpoint desc failed\n");
+					return RT_ERROR;
+				}
+			}
+			/* find driver by class code found in interface descriptor */
+			drv = rt_usbh_class_driver_find(intf_desc->bInterfaceClass, 
+				intf_desc->bInterfaceSubClass);
+
+			if(drv != RT_NULL)
+			{
+				/* allocate memory for interface device */
+				device->intf[i] = (struct uhintf*)rt_malloc(sizeof(struct uhintf));
+				device->intf[i]->drv = drv;
+				device->intf[i]->device = device;
+				device->intf[i]->intf_desc = intf_desc;
+				device->intf[i]->user_data = RT_NULL;
+
+				/* open usb class driver */
+				ret = rt_usbh_class_driver_enable(drv, (void*)&device->intf[i]);
+				if(ret != RT_EOK)
+				{
+					rt_kprintf("interface %d run class driver error\n", i);
+				}
+			}
+			else
+			{
+				rt_kprintf("find usb device driver failed\n");
+			}
+			i++;
+		}
+	}
 
     return RT_EOK;
 }
@@ -276,12 +346,14 @@ rt_err_t rt_usbh_detach_instance(uinst_t device)
         for (i = 0; i < device->cfg_desc->bNumInterfaces; i++)
         {
             if (device->intf[i] == RT_NULL) continue;
-            if (device->intf[i]->drv == RT_NULL) continue;
 
             RT_ASSERT(device->intf[i]->device == device);
 
             LOG_D("free interface instance %d", i);
-            rt_usbh_class_driver_disable(device->intf[i]->drv, (void*)device->intf[i]);
+            if (device->intf[i]->drv)
+            {
+                rt_usbh_class_driver_disable(device->intf[i]->drv, (void*)&device->intf[i]);
+            }
             rt_free(device->intf[i]);
         }
         rt_free(device->cfg_desc);
@@ -302,6 +374,36 @@ rt_err_t rt_usbh_detach_instance(uinst_t device)
 }
 
 /**
+ * This function will process sof interrupt, it callback the pipe callback function
+ *
+ * @param device the usb device instance.
+ * 
+ * @return the error code, RT_EOK on successfully.
+ */
+rt_err_t rt_usbh_instance_sof_process(uinst_t device)
+{
+    rt_list_t * l;
+    upipe_t pipe = RT_NULL;
+    
+    if(device == RT_NULL) 
+    {
+        rt_kprintf("no usb instance to process sof\n");
+        return -RT_ERROR;
+    }
+
+    for(l = device->pipe.next; l != &device->pipe; l = l->next)
+    {
+        pipe = rt_list_entry(l, struct upipe,list);
+        if(pipe && pipe->callback)
+        {
+            pipe->callback(pipe->user_data);
+        }
+    }
+
+    return RT_EOK;
+}
+
+/**
  * This function will do USB_REQ_GET_DESCRIPTO' bRequest for the usb device instance,
  *
  * @param device the usb device instance.
@@ -315,7 +417,7 @@ rt_err_t rt_usbh_get_descriptor(uinst_t device, rt_uint8_t type, void* buffer,
     int nbytes)
 {
     struct urequest setup;
-    int timeout = USB_TIMEOUT_BASIC;
+    int timeout = USB_TIMEOUT_LONG;
 
     RT_ASSERT(device != RT_NULL);
 
@@ -470,6 +572,63 @@ rt_err_t rt_usbh_clear_feature(uinst_t device, int endpoint, int feature)
     return RT_EOK;
 }
 
+
+/**
+ * This function will get an IAD descriptor from the configuration descriptor before the insterface num.
+ *
+ * @param cfg_desc the point of configuration descriptor structure.
+ * @param num the number of interface descriptor.
+ * @intf_desc the point of interface descriptor point.
+ * 
+ * @return the error code, RT_EOK on successfully.
+ */
+rt_err_t rt_usbh_get_IAD_descriptor(ucfg_desc_t cfg_desc, int num, 
+                              uiad_desc_t* iad_desc)
+{
+    rt_uint32_t ptr = 0, depth = 0;
+    rt_uint32_t last_len = 0;
+    udesc_t desc;
+
+    /* check parameter */
+    RT_ASSERT(cfg_desc != RT_NULL);
+
+    ptr = (rt_uint32_t)cfg_desc + cfg_desc->bLength;
+    while(ptr < (rt_uint32_t)cfg_desc + cfg_desc->wTotalLength)
+    {
+        if(depth++ > 0x20) 
+        {
+            *iad_desc = RT_NULL;        
+            return -RT_EIO;
+        }
+        desc = (udesc_t)ptr;
+        if(desc->type == USB_DESC_TYPE_INTERFACE)
+        {
+            if(((uintf_desc_t)desc)->bInterfaceNumber == num)
+            {
+                /*check the before interface is IAD descripter ?*/
+                ptr = (rt_uint32_t)desc - last_len;
+
+                desc = (udesc_t)ptr;
+                if(desc->type == USB_DESC_TYPE_IAD)
+                {
+                    *iad_desc = (uiad_desc_t)desc;
+
+                    LOG_D("rt_usb_get_IAD_descriptor before interface num: %d\n", num);                
+                    return RT_EOK;
+                }
+                else
+                {
+                    return -RT_EIO;
+                }
+            }
+        }    
+        ptr = (rt_uint32_t)desc + desc->bLength;
+        last_len = desc->bLength;
+    }
+
+    return -RT_EIO;
+}
+
 /**
  * This function will get an interface descriptor from the configuration descriptor.
  *
@@ -562,25 +721,31 @@ rt_err_t rt_usbh_get_endpoint_descriptor(uintf_desc_t intf_desc, int num,
     return -RT_EIO;
 }
 
+
+/**
+ * This function send or recv the data from USB driver.
+ *
+ * @param hcd ubhcd.
+ * @param pipe usb host pipe.
+ * @param buffer usb data buffer.
+ * @param nbytes usb data len.
+ * @param timeout usb send or receive timeout
+ * 
+ * @return the error code, RT_EOK on successfully.
+ */
 int rt_usb_hcd_pipe_xfer(uhcd_t hcd, upipe_t pipe, void* buffer, int nbytes, int timeout)
 {
-    rt_size_t remain_size;
-    rt_size_t send_size;
-    remain_size = nbytes;
-    rt_uint8_t * pbuffer = (rt_uint8_t *)buffer;
-    do
+    int  len = 0;
+
+    len = hcd->ops->pipe_xfer(pipe, USBH_PID_DATA, buffer, nbytes, timeout);
+	rt_kprintf("rndis nbyte = %d, read_len = %d\n", nbytes, len);
+    if((len >=0) && (len <= nbytes))
     {
-        LOG_D("pipe transform remain size,: %d", remain_size);
-        send_size = (remain_size > pipe->ep.wMaxPacketSize) ? pipe->ep.wMaxPacketSize : remain_size;
-        if(hcd->ops->pipe_xfer(pipe, USBH_PID_DATA, pbuffer, send_size, timeout) == send_size)
-        {
-            remain_size -= send_size;
-            pbuffer += send_size;
-        }
-        else
-        {
-            return 0;
-        }
-    }while(remain_size > 0);
-    return nbytes;
+        
+        return len;
+    }
+    else
+    {
+        return -1;
+    }
 }

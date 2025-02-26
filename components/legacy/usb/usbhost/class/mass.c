@@ -529,18 +529,18 @@ static rt_err_t rt_usbh_storage_enable(void* arg)
     int i = 0;
     rt_err_t ret;
     ustor_t stor;
-    struct uhintf* intf = (struct uhintf*)arg;
+    struct uhintf **intf = arg;
 
     /* parameter check */
-    if(intf == RT_NULL)
+    if(intf[0] == RT_NULL)
     {
         rt_kprintf("the interface is not available\n");
         return -RT_EIO;
     }
 
     LOG_D("subclass %d, protocal %d",
-        intf->intf_desc->bInterfaceSubClass,
-        intf->intf_desc->bInterfaceProtocol);
+        intf[0]->intf_desc->bInterfaceSubClass,
+        intf[0]->intf_desc->bInterfaceProtocol);
 
     LOG_D("rt_usbh_storage_run");
 
@@ -551,14 +551,14 @@ static rt_err_t rt_usbh_storage_enable(void* arg)
 
     /* initilize the data structure */
     rt_memset(stor, 0, sizeof(struct ustor));
-    intf->user_data = (void*)stor;
+    intf[0]->user_data = (void*)stor;
 
-    for(i=0; i<intf->intf_desc->bNumEndpoints; i++)
+    for(i=0; i<intf[0]->intf_desc->bNumEndpoints; i++)
     {
         uep_desc_t ep_desc;
 
         /* get endpoint descriptor from interface descriptor */
-        rt_usbh_get_endpoint_descriptor(intf->intf_desc, i, &ep_desc);
+        rt_usbh_get_endpoint_descriptor(intf[0]->intf_desc, i, &ep_desc);
         if(ep_desc == RT_NULL)
         {
             rt_kprintf("rt_usb_get_endpoint_descriptor error\n");
@@ -573,12 +573,12 @@ static rt_err_t rt_usbh_storage_enable(void* arg)
         if(ep_desc->bEndpointAddress & USB_DIR_IN)
         {
             /* alloc an in pipe for the storage instance */
-            stor->pipe_in = rt_usb_instance_find_pipe(intf->device,ep_desc->bEndpointAddress);
+            stor->pipe_in = rt_usb_instance_find_pipe(intf[0]->device,ep_desc->bEndpointAddress);
         }
         else
         {
             /* alloc an output pipe for the storage instance */
-            stor->pipe_out = rt_usb_instance_find_pipe(intf->device,ep_desc->bEndpointAddress);
+            stor->pipe_out = rt_usb_instance_find_pipe(intf[0]->device,ep_desc->bEndpointAddress);
         }
     }
 
@@ -590,7 +590,7 @@ static rt_err_t rt_usbh_storage_enable(void* arg)
     }
 
     /* should implement as callback */
-    ret = rt_udisk_run(intf);
+    ret = rt_udisk_run(intf[0]);
     if(ret != RT_EOK) return ret;
 
     return RT_EOK;
@@ -607,19 +607,19 @@ static rt_err_t rt_usbh_storage_enable(void* arg)
 static rt_err_t rt_usbh_storage_disable(void* arg)
 {
     ustor_t stor;
-    struct uhintf* intf = (struct uhintf*)arg;
+    struct uhintf** intf = arg;
 
     /* parameter check */
-    RT_ASSERT(intf != RT_NULL);
-    RT_ASSERT(intf->user_data != RT_NULL);
-    RT_ASSERT(intf->device != RT_NULL);
+    RT_ASSERT(intf[0] != RT_NULL);
+    RT_ASSERT(intf[0]->user_data != RT_NULL);
+    RT_ASSERT(intf[0]->device != RT_NULL);
 
     LOG_D("rt_usbh_storage_stop");
 
     /* get storage instance from interface instance */
-    stor = (ustor_t)intf->user_data;
+    stor = (ustor_t)intf[0]->user_data;
 
-    rt_udisk_stop(intf);
+    rt_udisk_stop(intf[0]);
 
 
     /* free storage instance */

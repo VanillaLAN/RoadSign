@@ -567,7 +567,7 @@ typedef struct usb_os_function_comp_id_descriptor * usb_os_func_comp_id_desc_t;
 
 /* the priority of USB thread */
 #ifndef RT_USBD_THREAD_PRIO
-#define RT_USBD_THREAD_PRIO 8
+#define RT_USBD_THREAD_PRIO 2
 #endif
 
 

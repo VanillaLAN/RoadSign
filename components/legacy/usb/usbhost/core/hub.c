@@ -51,6 +51,9 @@ static rt_err_t root_hub_ctrl(struct uhcd *hcd, rt_uint16_t port, rt_uint8_t cmd
         case PORT_FEAT_C_RESET:
             hcd->roothub->port_status[port-1] &= ~PORT_PRSC;
             break;
+		case PORT_FEAT_POWER:
+            hcd->ops->vbus_contorl(port, RT_FALSE);
+            break;
         }
         break;
     case RH_SET_PORT_FEATURE:
@@ -72,6 +75,7 @@ static rt_err_t root_hub_ctrl(struct uhcd *hcd, rt_uint16_t port, rt_uint8_t cmd
             hcd->ops->reset_port(port);
             break;
         case PORT_FEAT_POWER:
+            hcd->ops->vbus_contorl(port, RT_TRUE);
             break;
         case PORT_FEAT_LOWSPEED:
             break;
@@ -84,21 +88,17 @@ static rt_err_t root_hub_ctrl(struct uhcd *hcd, rt_uint16_t port, rt_uint8_t cmd
     }
     return RT_EOK;
 }
-void rt_usbh_root_hub_connect_handler(struct uhcd *hcd, rt_uint8_t port, rt_bool_t isHS)
+void rt_usbh_root_hub_connect_handler(struct uhcd *hcd, rt_uint8_t port)
 {
     struct uhost_msg msg;
     msg.type = USB_MSG_CONNECT_CHANGE;
     msg.content.hub = hcd->roothub;
     hcd->roothub->port_status[port - 1] |= PORT_CCS | PORT_CCSC;
-    if(isHS)
+    
+    if(-RT_EFULL == rt_usbh_event_signal(hcd, &msg))
     {
-        hcd->roothub->port_status[port - 1] &= ~PORT_LSDA;
+        rt_kprintf("msg is full in connect handler\n");    
     }
-    else
-    {
-        hcd->roothub->port_status[port - 1] |= PORT_LSDA;
-    }
-    rt_usbh_event_signal(hcd, &msg);
 }
 
 void rt_usbh_root_hub_disconnect_handler(struct uhcd *hcd, rt_uint8_t port)
@@ -108,7 +108,32 @@ void rt_usbh_root_hub_disconnect_handler(struct uhcd *hcd, rt_uint8_t port)
     msg.content.hub = hcd->roothub;
     hcd->roothub->port_status[port - 1] |= PORT_CCSC;
     hcd->roothub->port_status[port - 1] &= ~PORT_CCS;
-    rt_usbh_event_signal(hcd, &msg);
+    if(-RT_EFULL == rt_usbh_event_signal(hcd, &msg))
+    {
+        rt_kprintf("msg is full in disconnect handler\n");    
+    }
+}
+
+void rt_usbh_root_hub_port_enable_handler(struct uhcd *hcd, rt_uint8_t port, rt_bool_t isHS)
+{
+    /*set the port enable */
+    hcd->roothub->port_status[port - 1] |= PORT_PESC;
+
+    if(isHS)
+    {
+        hcd->roothub->port_status[port - 1] &= ~PORT_LSDA;
+    }
+    else
+    {
+        hcd->roothub->port_status[port - 1] |= PORT_LSDA;
+    }
+    
+}
+
+void rt_usbh_root_hub_port_disable_handler(struct uhcd *hcd, rt_uint8_t port)
+{
+    /*set the port disable */
+    hcd->roothub->port_status[port - 1] &= ~PORT_PESC;
 }
 
 /**
@@ -312,27 +337,39 @@ rt_err_t rt_usbh_hub_reset_port(uhub_t hub, rt_uint16_t port)
 {
     rt_err_t ret;
     rt_uint32_t pstatus;
+		rt_uint32_t i = 0;
+#define  RT_USBH_RESET_PORT_TIMEOUT 4   
 
     /* parameter check */
     RT_ASSERT(hub != RT_NULL);
 
-    rt_thread_delay(50);
+    rt_thread_mdelay(50);
 
     /* reset hub port */
     ret = rt_usbh_hub_set_port_feature(hub, port, PORT_FEAT_RESET);
     if(ret != RT_EOK) return ret;
 
-    while(1)
+    for(i = 0; i < RT_USBH_RESET_PORT_TIMEOUT; i++)
     {
+        
         ret = rt_usbh_hub_get_port_status(hub, port, &pstatus);
-        if(!(pstatus & PORT_PRS)) break;
+        /*wait the port enable*/
+        if((pstatus & PORT_PESC))
+        {
+            break;
+        }
+        rt_thread_mdelay(50);
     }
 
+    if(i < RT_USBH_RESET_PORT_TIMEOUT)
+    {
+       rt_usbh_hub_clear_port_feature(hub, port, PORT_FEAT_C_ENABLE);
+       
+    }
+    
     /* clear port reset feature */
-    ret = rt_usbh_hub_clear_port_feature(hub, port, PORT_FEAT_C_RESET);
+    ret = rt_usbh_hub_clear_port_feature(hub, port, PORT_FEAT_C_RESET);    
     if(ret != RT_EOK) return ret;
-
-    rt_thread_delay(50);
 
     return RT_EOK;
 }
@@ -386,8 +423,8 @@ rt_err_t rt_usbh_hub_port_debounce(uhub_t hub, rt_uint16_t port)
  */
 static rt_err_t rt_usbh_hub_port_change(uhub_t hub)
 {
-    int i;
-    rt_bool_t reconnect;
+    int i = 0;
+    rt_bool_t reconnect = 0;
 
     /* parameter check */
     RT_ASSERT(hub != RT_NULL);
@@ -438,15 +475,18 @@ static rt_err_t rt_usbh_hub_port_change(uhub_t hub)
             device = rt_usbh_alloc_instance(hub->hcd);
             if(device == RT_NULL) break;
 
-            /* set usb device speed */
+            /* reset usb roothub port */
+            rt_usbh_hub_reset_port(hub, i + 1);
+
+            /* reset usb roothub port success and get the device speed*/
+            rt_usbh_hub_get_port_status(hub, i + 1, &pstatus);
+						
+			/* set usb device speed */
             device->speed = (pstatus & PORT_LSDA) ? 1 : 0;
             device->parent_hub = hub;
             device->hcd = hub->hcd;
             device->port = i + 1;
             hub->child[i] = device;
-
-            /* reset usb roothub port */
-            rt_usbh_hub_reset_port(hub, i + 1);
 
             /* attatch the usb instance to the hcd */
             rt_usbh_attatch_instance(device);
@@ -687,9 +727,7 @@ rt_err_t rt_usbh_event_signal(uhcd_t hcd, struct uhost_msg* msg)
     RT_ASSERT(msg != RT_NULL);
 
     /* send message to usb message queue */
-    rt_mq_send(hcd->usb_mq, (void*)msg, sizeof(struct uhost_msg));
-
-    return RT_EOK;
+    return rt_mq_send(hcd->usb_mq, (void*)msg, sizeof(struct uhost_msg));
 }
 
 /**

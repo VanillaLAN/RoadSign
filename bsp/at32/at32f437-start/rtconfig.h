@@ -180,13 +180,6 @@
 #define RT_SERIAL_USING_DMA
 #define RT_SERIAL_RB_BUFSZ 256
 #define RT_USING_PIN
-#define RT_USING_CHERRYUSB
-#define RT_CHERRYUSB_HOST
-#define RT_CHERRYUSB_HOST_DWC2_AT
-#define RT_CHERRYUSB_HOST_MSC
-#define RT_CHERRYUSB_HOST_CDC_ECM
-#define CONFIG_USBHOST_PLATFORM_CDC_ECM
-#define RT_LWIP_PBUF_POOL_BUFSIZE 1600
 /* end of Device Drivers */
 
 /* C/C++ and POSIX layer */
@@ -205,6 +198,8 @@
 /* POSIX (Portable Operating System Interface) layer */
 
 #define RT_USING_POSIX_FS
+#define RT_USING_POSIX_POLL
+#define RT_USING_POSIX_SELECT
 
 /* Interprocess Communication (IPC) */
 
@@ -263,8 +258,6 @@
 #define RT_LWIP_TCPTHREAD_PRIORITY 10
 #define RT_LWIP_TCPTHREAD_MBOX_SIZE 8
 #define RT_LWIP_TCPTHREAD_STACKSIZE 2048
-#define LWIP_NO_RX_THREAD
-#define LWIP_NO_TX_THREAD
 #define RT_LWIP_ETHTHREAD_PRIORITY 12
 #define RT_LWIP_ETHTHREAD_STACKSIZE 1024
 #define RT_LWIP_ETHTHREAD_MBOX_SIZE 8
@@ -290,7 +283,14 @@
 
 /* Using USB legacy version */
 
+#define RT_USING_USB
+#define RT_USING_USB_HOST
+#define RT_USBH_MSTORAGE
+#define UDISK_MOUNTPOINT "/"
+#define RT_USBD_THREAD_STACK_SZ 4096
 /* end of Using USB legacy version */
+#define RT_USBH_RNDIS
+#define RT_USBH_RNDIS_DEV
 /* end of RT-Thread Components */
 
 /* RT-Thread Utestcases */
@@ -545,6 +545,9 @@
 
 #define BSP_USING_GPIO
 #define BSP_USING_ON_CHIP_FLASH
+#define BSP_USING_USBOTG
+#define BSP_USING_USBOTG1
+#define BSP_USING_HOST_USBOTG1
 #define BSP_USING_UART
 #define BSP_USING_UART1
 #define BSP_UART1_RX_USING_DMA

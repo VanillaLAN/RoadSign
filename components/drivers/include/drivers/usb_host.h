@@ -130,6 +130,7 @@ struct uhcd_ops
     int         (*pipe_xfer)    (upipe_t pipe, rt_uint8_t token, void* buffer, int nbytes, int timeout);
     rt_err_t    (*open_pipe)    (upipe_t pipe);
     rt_err_t    (*close_pipe)   (upipe_t pipe);
+	rt_err_t    (*vbus_contorl) (rt_uint8_t port, rt_uint8_t power);
 };
 typedef struct uhcd_ops* uhcd_ops_t;
 struct uhcd
@@ -146,6 +147,7 @@ enum uhost_msg_type
 {
     USB_MSG_CONNECT_CHANGE,
     USB_MSG_CALLBACK,
+		USB_MSG_SOF_INTERRUPT,
 };
 typedef enum uhost_msg_type uhost_msg_type;
 
@@ -172,11 +174,13 @@ void rt_usbh_hub_init(struct uhcd *hcd);
 struct uinstance* rt_usbh_alloc_instance(uhcd_t uhcd);
 rt_err_t rt_usbh_attatch_instance(struct uinstance* device);
 rt_err_t rt_usbh_detach_instance(struct uinstance* device);
+rt_err_t rt_usbh_instance_sof_process(uinst_t device);
 rt_err_t rt_usbh_get_descriptor(struct uinstance* device, rt_uint8_t type, void* buffer, int nbytes);
 rt_err_t rt_usbh_set_configure(struct uinstance* device, int config);
 rt_err_t rt_usbh_set_address(struct uinstance* device);
 rt_err_t rt_usbh_set_interface(struct uinstance* device, int intf);
 rt_err_t rt_usbh_clear_feature(struct uinstance* device, int endpoint, int feature);
+rt_err_t rt_usbh_get_IAD_descriptor(ucfg_desc_t cfg_desc, int num, uiad_desc_t* iad_desc);
 rt_err_t rt_usbh_get_interface_descriptor(ucfg_desc_t cfg_desc, int num, uintf_desc_t* intf_desc);
 rt_err_t rt_usbh_get_endpoint_descriptor(uintf_desc_t intf_desc, int num, uep_desc_t* ep_desc);
 
@@ -191,6 +195,7 @@ ucd_t rt_usbh_class_driver_find(int class_code, int subclass_code);
 /* usb class driver implement */
 ucd_t rt_usbh_class_driver_hub(void);
 ucd_t rt_usbh_class_driver_storage(void);
+ucd_t rt_usbh_class_driver_rndis(void);
 
 
 
@@ -208,8 +213,11 @@ rt_err_t rt_usbh_hub_reset_port(uhub_t uhub, rt_uint16_t port);
 rt_err_t rt_usbh_event_signal(uhcd_t uhcd, struct uhost_msg* msg);
 
 
-void rt_usbh_root_hub_connect_handler(struct uhcd *hcd, rt_uint8_t port, rt_bool_t isHS);
+void rt_usbh_root_hub_connect_handler(struct uhcd *hcd, rt_uint8_t port);
 void rt_usbh_root_hub_disconnect_handler(struct uhcd *hcd, rt_uint8_t port);
+void rt_usbh_root_hub_sof_handler(struct uhcd *hcd, rt_uint8_t port);
+void rt_usbh_root_hub_port_enable_handler(struct uhcd *hcd, rt_uint8_t port, rt_bool_t isHS);
+void rt_usbh_root_hub_port_disable_handler(struct uhcd *hcd, rt_uint8_t port);
 
 /* usb host controller driver interface */
 rt_inline rt_err_t rt_usb_instance_add_pipe(uinst_t inst, upipe_t pipe)
@@ -233,7 +241,8 @@ rt_inline upipe_t rt_usb_instance_find_pipe(uinst_t inst,rt_uint8_t ep_address)
 }
 rt_inline rt_err_t rt_usb_hcd_alloc_pipe(uhcd_t hcd, upipe_t* pipe, uinst_t inst, uep_desc_t ep)
 {
-    *pipe = (upipe_t)rt_malloc(sizeof(struct upipe));
+    rt_err_t  ret = 0;
+		*pipe = (upipe_t)rt_malloc(sizeof(struct upipe));
     if(*pipe == RT_NULL)
     {
         return -RT_ERROR;
@@ -241,7 +250,13 @@ rt_inline rt_err_t rt_usb_hcd_alloc_pipe(uhcd_t hcd, upipe_t* pipe, uinst_t inst
     rt_memset(*pipe,0,sizeof(struct upipe));
     (*pipe)->inst = inst;
     rt_memcpy(&(*pipe)->ep,ep,sizeof(struct uendpoint_descriptor));
-    return hcd->ops->open_pipe(*pipe);
+    ret = hcd->ops->open_pipe(*pipe);
+    if(ret != RT_EOK)
+    {
+        rt_free(*pipe);
+        *pipe = RT_NULL;
+    }
+    return ret;
 }
 rt_inline void rt_usb_pipe_add_callback(upipe_t pipe, func_callback callback)
 {

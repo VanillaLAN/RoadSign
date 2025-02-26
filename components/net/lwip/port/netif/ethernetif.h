@@ -19,6 +19,9 @@ extern "C" {
 #include <rtthread.h>
 
 #define NIOCTL_GADDR        0x01
+#define NIOTCTL_GTXCOUNTER  0x02
+#define NIOTCTL_GRXCOUNTER  0X03
+
 #ifndef RT_LWIP_ETH_MTU
 #define ETHERNET_MTU        1500
 #else

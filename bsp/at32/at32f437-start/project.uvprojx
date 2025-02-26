@@ -17,10 +17,10 @@
           <Device>-AT32F437VGT7</Device>
           <Vendor>ArteryTek</Vendor>
           <PackID>ArteryTek.AT32F435_437_DFP.2.1.3</PackID>
-          <Cpu>IRAM(0x20000000,0x60000) IROM(0x08000000,0x100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
+          <Cpu>IRAM(0x20000000,0x60000) IROM(0x08000000,0x3F0000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
-          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0AT32F437_1024 -FS08000000 -FL0100000 -FP0($$Device:-AT32F437VGT7$Flash\AT32F437_1024.FLM))</FlashDriverDll>
+          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0AT32F437_4032 -FS08000000 -FL03F0000 -FP0($$Device:-AT32F437VGT7$Flash\AT32F437_4032.FLM))</FlashDriverDll>
           <DeviceId>0</DeviceId>
           <RegisterFile>$$Device:-AT32F437VGT7$Device\Include\at32f435_437.h</RegisterFile>
           <MemoryEnv></MemoryEnv>
@@ -248,7 +248,7 @@
               <IROM>
                 <Type>1</Type>
                 <StartAddress>0x8000000</StartAddress>
-                <Size>0x100000</Size>
+                <Size>0x3f0000</Size>
               </IROM>
               <XRAM>
                 <Type>0</Type>
@@ -273,7 +273,7 @@
               <OCR_RVCT4>
                 <Type>1</Type>
                 <StartAddress>0x8000000</StartAddress>
-                <Size>0x100000</Size>
+                <Size>0x3f0000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -333,9 +333,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--gnu</MiscControls>
-              <Define>__CLK_TCK=RT_TICK_PER_SECOND, __RTTHREAD__, USE_STDPERIPH_DRIVER, __STDC_LIMIT_MACROS, AT32F437VGT7, RT_USING_ARMLIBC, RT_USING_LIBC</Define>
+              <Define>__RTTHREAD__, RT_USING_ARMLIBC, RT_USING_LIBC, AT32F437VGT7, USE_STDPERIPH_DRIVER, __CLK_TCK=RT_TICK_PER_SECOND, __STDC_LIMIT_MACROS</Define>
               <Undefine></Undefine>
-              <IncludePath>packages\kawaii-mqtt-latest\mqtt;..\..\..\components\libc\posix\io\eventfd;..\..\..\components\drivers\usb\cherryusb\core;..\..\..\components\net\lwip\port;..\..\..\include;..\..\..\components\drivers\usb\cherryusb\class\midi;..\..\..\components\libc\compilers\common\include;..\libraries\usbotg_library\inc;..\..\..\components\libc\posix\io\poll;..\..\..\components\drivers\phy;packages\kawaii-mqtt-latest\network;..\..\..\components\libc\posix\io\epoll;..\..\..\components\drivers\usb\cherryusb\class\hid;..\..\..\components\net\lwip\lwip-2.1.2\src\include\netif;..\libraries\AT32F435_437_Firmware_Library\cmsis\cm4\device_support;..\libraries\rt_drivers\config;..\..\..\components\dfs\dfs_v1\filesystems\devfs;packages\tinycrypt-latest\include;..\..\..\components\drivers\usb\cherryusb\class\wireless;packages\kawaii-mqtt-latest\common;..\..\..\components\drivers\usb\cherryusb\class\hub;..\..\..\components\drivers\usb\cherryusb\class\msc;..\..\..\components\dfs\dfs_v1\include;packages\cJSON-v1.7.17;..\..\..\components\drivers\include;board\inc;..\..\..\components\libc\compilers\common\extension\fcntl\octal;..\libraries\AT32F435_437_Firmware_Library\drivers\inc;packages\kawaii-mqtt-latest\mqttclient;..\..\..\libcpu\arm\cortex-m4;..\..\..\components\drivers\usb\cherryusb\class\dfu;..\..\..\components\drivers\usb\cherryusb\class\audio;..\..\..\components\drivers\usb\cherryusb\class\video;..\..\..\components\fal\inc;..\..\..\components\net\sal\include;..\..\..\components\net\sal\include\dfs_net;..\..\..\components\drivers\include;..\..\..\components\drivers\smp_call;..\..\..\components\libc\posix\ipc;.;..\..\..\components\dfs\dfs_v1\filesystems\elmfat;..\..\..\components\net\netdev\include;..\..\..\components\drivers\usb\cherryusb\common;packages\netutils-latest\ntp;..\..\..\components\drivers\usb\cherryusb\class\vendor\net;..\..\..\components\net\sal\include\socket\sys_socket;..\..\..\components\net\lwip\lwip-2.1.2\src\include;packages\webclient-v2.1.2\inc;..\..\..\components\drivers\usb\cherryusb\class\cdc;..\..\..\components\finsh;..\..\..\components\drivers\include;packages\kawaii-mqtt-latest\platform\RT-Thread;..\..\..\components\drivers\include;packages\gps_rmc-latest;..\..\..\libcpu\arm\common;..\..\..\components\net\sal\include\socket;..\..\..\components\net\sal\impl;..\..\..\components\drivers\include;..\libraries\AT32F435_437_Firmware_Library\cmsis\cm4\core_support;applications;..\..\..\components\libc\compilers\common\extension;board;..\libraries\rt_drivers;..\..\..\components\drivers\usb\cherryusb\class\vendor\serial</IncludePath>
+              <IncludePath>..\..\..\components\drivers\include;..\..\..\components\net\sal\include\dfs_net;..\libraries\rt_drivers;packages\kawaii-mqtt-latest\platform\RT-Thread;..\..\..\components\legacy\usb\usbhost;..\libraries\AT32F435_437_Firmware_Library\cmsis\cm4\device_support;..\..\..\components\legacy\include;..\..\..\components\fal\inc;..\..\..\components\drivers\include;..\..\..\components\net\sal\include\socket;..\..\..\components\net\sal\include\socket\sys_socket;packages\cJSON-v1.7.17;..\..\..\components\drivers\phy;..\..\..\components\drivers\include;packages\webclient-v2.1.2\inc;..\..\..\components\net\sal\impl;..\..\..\components\dfs\dfs_v1\filesystems\elmfat;..\..\..\components\legacy\usb\usbhost\core;..\..\..\components\dfs\dfs_v1\include;..\..\..\components\net\lwip\lwip-2.1.2\src\include;..\..\..\components\net\lwip\lwip-2.1.2\src\include\netif;..\..\..\include;packages\kawaii-mqtt-latest\mqttclient;..\..\..\components\libc\posix\io\poll;..\..\..\components\libc\posix\io\eventfd;..\..\..\components\legacy\usb\usbhost\include;packages\netutils-latest\ntp;.;..\..\..\libcpu\arm\cortex-m4;packages\tinycrypt-latest\include;..\..\..\libcpu\arm\common;..\libraries\AT32F435_437_Firmware_Library\cmsis\cm4\core_support;..\..\..\components\libc\compilers\common\extension;..\..\..\components\drivers\smp_call;..\..\..\components\libc\compilers\common\extension\fcntl\octal;packages\kawaii-mqtt-latest\common;..\..\..\components\dfs\dfs_v1\filesystems\devfs;applications;..\..\..\components\net\lwip\port;board\inc;packages\kawaii-mqtt-latest\network;..\libraries\AT32F435_437_Firmware_Library\drivers\inc;..\..\..\components\legacy\usb\usbhost\class;..\..\..\components\net\sal\include;board;..\..\..\components\drivers\include;..\libraries\rt_drivers\config;..\..\..\components\libc\compilers\common\include;..\..\..\components\finsh;packages\gps_rmc-latest;..\libraries\usbotg_library\inc;..\..\..\components\drivers\include;..\..\..\components\net\netdev\include;..\..\..\components\libc\posix\io\epoll;packages\kawaii-mqtt-latest\mqtt;..\..\..\components\libc\posix\ipc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -387,77 +387,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>CherryUSB</GroupName>
-          <Files>
-            <File>
-              <FileName>usb_osal_rtthread.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\components\drivers\usb\cherryusb\osal\usb_osal_rtthread.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbh_core.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\components\drivers\usb\cherryusb\core\usbh_core.c</FilePath>
-            </File>
-            <File>
-              <FileName>usb_check.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\components\drivers\usb\cherryusb\platform\rtthread\usb_check.c</FilePath>
-            </File>
-            <File>
-              <FileName>usb_msh.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\components\drivers\usb\cherryusb\platform\rtthread\usb_msh.c</FilePath>
-            </File>
-            <File>
-              <FileName>usb_hc_dwc2.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\components\drivers\usb\cherryusb\port\dwc2\usb_hc_dwc2.c</FilePath>
-            </File>
-            <File>
-              <FileName>usb_glue_at.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\components\drivers\usb\cherryusb\port\dwc2\usb_glue_at.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbh_dfs.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\components\drivers\usb\cherryusb\platform\rtthread\usbh_dfs.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbh_hub.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\components\drivers\usb\cherryusb\class\hub\usbh_hub.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbh_msc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\components\drivers\usb\cherryusb\class\msc\usbh_msc.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbh_lwip.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\components\drivers\usb\cherryusb\platform\rtthread\usbh_lwip.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbh_cdc_ecm.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\components\drivers\usb\cherryusb\class\cdc\usbh_cdc_ecm.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>cJSON</GroupName>
           <Files>
-            <File>
-              <FileName>cJSON.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\cJSON-v1.7.17\cJSON.c</FilePath>
-            </File>
             <File>
               <FileName>cJSON_Utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\cJSON-v1.7.17\cJSON_Utils.c</FilePath>
+            </File>
+            <File>
+              <FileName>cJSON.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\cJSON-v1.7.17\cJSON.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1209,20 +1149,25 @@
               <FileType>1</FileType>
               <FilePath>..\libraries\rt_drivers\drv_usart.c</FilePath>
             </File>
+            <File>
+              <FileName>drv_usbotgh.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\rt_drivers\drv_usbotgh.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>Fal</GroupName>
           <Files>
             <File>
-              <FileName>fal_rtt.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\components\fal\src\fal_rtt.c</FilePath>
-            </File>
-            <File>
               <FileName>fal_flash.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\components\fal\src\fal_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>fal_rtt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\components\fal\src\fal_rtt.c</FilePath>
             </File>
             <File>
               <FileName>fal.c</FileName>
@@ -1685,19 +1630,14 @@
           <GroupName>Finsh</GroupName>
           <Files>
             <File>
-              <FileName>cmd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\components\finsh\cmd.c</FilePath>
-            </File>
-            <File>
-              <FileName>shell.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\components\finsh\shell.c</FilePath>
-            </File>
-            <File>
               <FileName>msh_parse.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\components\finsh\msh_parse.c</FilePath>
+            </File>
+            <File>
+              <FileName>msh.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\components\finsh\msh.c</FilePath>
             </File>
             <File>
               <FileName>msh_file.c</FileName>
@@ -1705,9 +1645,14 @@
               <FilePath>..\..\..\components\finsh\msh_file.c</FilePath>
             </File>
             <File>
-              <FileName>msh.c</FileName>
+              <FileName>shell.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\components\finsh\msh.c</FilePath>
+              <FilePath>..\..\..\components\finsh\shell.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\components\finsh\cmd.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1735,9 +1680,29 @@
               <FilePath>packages\kawaii-mqtt-latest\platform\RT-Thread\platform_mutex.c</FilePath>
             </File>
             <File>
-              <FileName>MQTTConnectClient.c</FileName>
+              <FileName>MQTTDeserializePublish.c</FileName>
               <FileType>1</FileType>
-              <FilePath>packages\kawaii-mqtt-latest\mqtt\MQTTConnectClient.c</FilePath>
+              <FilePath>packages\kawaii-mqtt-latest\mqtt\MQTTDeserializePublish.c</FilePath>
+            </File>
+            <File>
+              <FileName>platform_net_socket.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\kawaii-mqtt-latest\platform\RT-Thread\platform_net_socket.c</FilePath>
+            </File>
+            <File>
+              <FileName>nettype_tls.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\kawaii-mqtt-latest\network\nettype_tls.c</FilePath>
+            </File>
+            <File>
+              <FileName>mqtt_list.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\kawaii-mqtt-latest\common\mqtt_list.c</FilePath>
+            </File>
+            <File>
+              <FileName>MQTTConnectServer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\kawaii-mqtt-latest\mqtt\MQTTConnectServer.c</FilePath>
             </File>
             <File>
               <FileName>platform_thread.c</FileName>
@@ -1745,19 +1710,9 @@
               <FilePath>packages\kawaii-mqtt-latest\platform\RT-Thread\platform_thread.c</FilePath>
             </File>
             <File>
-              <FileName>MQTTUnsubscribeServer.c</FileName>
+              <FileName>random.c</FileName>
               <FileType>1</FileType>
-              <FilePath>packages\kawaii-mqtt-latest\mqtt\MQTTUnsubscribeServer.c</FilePath>
-            </File>
-            <File>
-              <FileName>mqttclient.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\kawaii-mqtt-latest\mqttclient\mqttclient.c</FilePath>
-            </File>
-            <File>
-              <FileName>platform_timer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\kawaii-mqtt-latest\platform\RT-Thread\platform_timer.c</FilePath>
+              <FilePath>packages\kawaii-mqtt-latest\common\random.c</FilePath>
             </File>
             <File>
               <FileName>network.c</FileName>
@@ -1765,19 +1720,24 @@
               <FilePath>packages\kawaii-mqtt-latest\network\network.c</FilePath>
             </File>
             <File>
-              <FileName>MQTTSubscribeClient.c</FileName>
+              <FileName>platform_timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>packages\kawaii-mqtt-latest\mqtt\MQTTSubscribeClient.c</FilePath>
+              <FilePath>packages\kawaii-mqtt-latest\platform\RT-Thread\platform_timer.c</FilePath>
             </File>
             <File>
-              <FileName>MQTTPacket.c</FileName>
+              <FileName>nettype_tcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>packages\kawaii-mqtt-latest\mqtt\MQTTPacket.c</FilePath>
+              <FilePath>packages\kawaii-mqtt-latest\network\nettype_tcp.c</FilePath>
             </File>
             <File>
-              <FileName>nettype_tls.c</FileName>
+              <FileName>platform_memory.c</FileName>
               <FileType>1</FileType>
-              <FilePath>packages\kawaii-mqtt-latest\network\nettype_tls.c</FilePath>
+              <FilePath>packages\kawaii-mqtt-latest\platform\RT-Thread\platform_memory.c</FilePath>
+            </File>
+            <File>
+              <FileName>MQTTSubscribeServer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\kawaii-mqtt-latest\mqtt\MQTTSubscribeServer.c</FilePath>
             </File>
             <File>
               <FileName>MQTTFormat.c</FileName>
@@ -1790,34 +1750,19 @@
               <FilePath>packages\kawaii-mqtt-latest\test\test.c</FilePath>
             </File>
             <File>
-              <FileName>random.c</FileName>
+              <FileName>MQTTPacket.c</FileName>
               <FileType>1</FileType>
-              <FilePath>packages\kawaii-mqtt-latest\common\random.c</FilePath>
+              <FilePath>packages\kawaii-mqtt-latest\mqtt\MQTTPacket.c</FilePath>
             </File>
             <File>
-              <FileName>nettype_tcp.c</FileName>
+              <FileName>mqttclient.c</FileName>
               <FileType>1</FileType>
-              <FilePath>packages\kawaii-mqtt-latest\network\nettype_tcp.c</FilePath>
+              <FilePath>packages\kawaii-mqtt-latest\mqttclient\mqttclient.c</FilePath>
             </File>
             <File>
-              <FileName>platform_net_socket.c</FileName>
+              <FileName>MQTTSubscribeClient.c</FileName>
               <FileType>1</FileType>
-              <FilePath>packages\kawaii-mqtt-latest\platform\RT-Thread\platform_net_socket.c</FilePath>
-            </File>
-            <File>
-              <FileName>MQTTConnectServer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\kawaii-mqtt-latest\mqtt\MQTTConnectServer.c</FilePath>
-            </File>
-            <File>
-              <FileName>MQTTDeserializePublish.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\kawaii-mqtt-latest\mqtt\MQTTDeserializePublish.c</FilePath>
-            </File>
-            <File>
-              <FileName>MQTTSubscribeServer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\kawaii-mqtt-latest\mqtt\MQTTSubscribeServer.c</FilePath>
+              <FilePath>packages\kawaii-mqtt-latest\mqtt\MQTTSubscribeClient.c</FilePath>
             </File>
             <File>
               <FileName>MQTTSerializePublish.c</FileName>
@@ -1825,19 +1770,19 @@
               <FilePath>packages\kawaii-mqtt-latest\mqtt\MQTTSerializePublish.c</FilePath>
             </File>
             <File>
+              <FileName>MQTTUnsubscribeServer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\kawaii-mqtt-latest\mqtt\MQTTUnsubscribeServer.c</FilePath>
+            </File>
+            <File>
               <FileName>test_ca.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\kawaii-mqtt-latest\test\test_ca.c</FilePath>
             </File>
             <File>
-              <FileName>mqtt_list.c</FileName>
+              <FileName>MQTTConnectClient.c</FileName>
               <FileType>1</FileType>
-              <FilePath>packages\kawaii-mqtt-latest\common\mqtt_list.c</FilePath>
-            </File>
-            <File>
-              <FileName>platform_memory.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>packages\kawaii-mqtt-latest\platform\RT-Thread\platform_memory.c</FilePath>
+              <FilePath>packages\kawaii-mqtt-latest\mqtt\MQTTConnectClient.c</FilePath>
             </File>
             <File>
               <FileName>MQTTUnsubscribeClient.c</FileName>
@@ -2735,6 +2680,11 @@
           <GroupName>klibc</GroupName>
           <Files>
             <File>
+              <FileName>kstring.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\src\klibc\kstring.c</FilePath>
+            </File>
+            <File>
               <FileName>rt_vsscanf.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\src\klibc\rt_vsscanf.c</FilePath>
@@ -2745,19 +2695,14 @@
               <FilePath>..\..\..\src\klibc\kstdio.c</FilePath>
             </File>
             <File>
-              <FileName>kerrno.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\src\klibc\kerrno.c</FilePath>
-            </File>
-            <File>
-              <FileName>kstring.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\src\klibc\kstring.c</FilePath>
-            </File>
-            <File>
               <FileName>rt_vsnprintf_tiny.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\src\klibc\rt_vsnprintf_tiny.c</FilePath>
+            </File>
+            <File>
+              <FileName>kerrno.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\src\klibc\kerrno.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2795,79 +2740,9 @@
           <GroupName>Libraries</GroupName>
           <Files>
             <File>
-              <FileName>at32f435_437_acc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_acc.c</FilePath>
-            </File>
-            <File>
               <FileName>at32f435_437_sdio.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_sdio.c</FilePath>
-            </File>
-            <File>
-              <FileName>at32f435_437_crm.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_crm.c</FilePath>
-            </File>
-            <File>
-              <FileName>at32f435_437_edma.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_edma.c</FilePath>
-            </File>
-            <File>
-              <FileName>at32f435_437_gpio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_gpio.c</FilePath>
-            </File>
-            <File>
-              <FileName>at32f435_437_can.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_can.c</FilePath>
-            </File>
-            <File>
-              <FileName>at32f435_437_qspi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_qspi.c</FilePath>
-            </File>
-            <File>
-              <FileName>at32f435_437_spi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_spi.c</FilePath>
-            </File>
-            <File>
-              <FileName>at32f435_437_wdt.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_wdt.c</FilePath>
-            </File>
-            <File>
-              <FileName>at32f435_437_misc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_misc.c</FilePath>
-            </File>
-            <File>
-              <FileName>at32f435_437_i2c.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_i2c.c</FilePath>
-            </File>
-            <File>
-              <FileName>at32f435_437_debug.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_debug.c</FilePath>
-            </File>
-            <File>
-              <FileName>at32f435_437_dvp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_dvp.c</FilePath>
-            </File>
-            <File>
-              <FileName>at32f435_437_xmc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_xmc.c</FilePath>
-            </File>
-            <File>
-              <FileName>at32f435_437_usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_usart.c</FilePath>
             </File>
             <File>
               <FileName>at32f435_437_dac.c</FileName>
@@ -2875,49 +2750,14 @@
               <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_dac.c</FilePath>
             </File>
             <File>
-              <FileName>at32f435_437_pwc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_pwc.c</FilePath>
-            </File>
-            <File>
-              <FileName>at32f435_437_emac.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_emac.c</FilePath>
-            </File>
-            <File>
-              <FileName>at32f435_437_ertc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_ertc.c</FilePath>
-            </File>
-            <File>
-              <FileName>at32f435_437_wwdt.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_wwdt.c</FilePath>
-            </File>
-            <File>
-              <FileName>at32f435_437_crc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_crc.c</FilePath>
-            </File>
-            <File>
               <FileName>at32f435_437_usb.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_usb.c</FilePath>
             </File>
             <File>
-              <FileName>at32f435_437_exint.c</FileName>
+              <FileName>at32f435_437_qspi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_exint.c</FilePath>
-            </File>
-            <File>
-              <FileName>at32f435_437_scfg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_scfg.c</FilePath>
-            </File>
-            <File>
-              <FileName>at32f435_437_dma.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_dma.c</FilePath>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_qspi.c</FilePath>
             </File>
             <File>
               <FileName>at32f435_437_adc.c</FileName>
@@ -2925,9 +2765,24 @@
               <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_adc.c</FilePath>
             </File>
             <File>
+              <FileName>at32f435_437_crm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_crm.c</FilePath>
+            </File>
+            <File>
+              <FileName>at32f435_437_debug.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_debug.c</FilePath>
+            </File>
+            <File>
               <FileName>system_at32f435_437.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\libraries\AT32F435_437_Firmware_Library\cmsis\cm4\device_support\system_at32f435_437.c</FilePath>
+            </File>
+            <File>
+              <FileName>at32f435_437_scfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_scfg.c</FilePath>
             </File>
             <File>
               <FileName>at32f435_437_flash.c</FileName>
@@ -2935,9 +2790,99 @@
               <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_flash.c</FilePath>
             </File>
             <File>
+              <FileName>at32f435_437_crc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_crc.c</FilePath>
+            </File>
+            <File>
+              <FileName>at32f435_437_dvp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_dvp.c</FilePath>
+            </File>
+            <File>
+              <FileName>at32f435_437_pwc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_pwc.c</FilePath>
+            </File>
+            <File>
+              <FileName>at32f435_437_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>at32f435_437_wwdt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_wwdt.c</FilePath>
+            </File>
+            <File>
+              <FileName>at32f435_437_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>at32f435_437_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>at32f435_437_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_usart.c</FilePath>
+            </File>
+            <File>
               <FileName>at32f435_437_tmr.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_tmr.c</FilePath>
+            </File>
+            <File>
+              <FileName>at32f435_437_can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_can.c</FilePath>
+            </File>
+            <File>
+              <FileName>at32f435_437_acc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_acc.c</FilePath>
+            </File>
+            <File>
+              <FileName>at32f435_437_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>at32f435_437_ertc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_ertc.c</FilePath>
+            </File>
+            <File>
+              <FileName>at32f435_437_wdt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_wdt.c</FilePath>
+            </File>
+            <File>
+              <FileName>at32f435_437_edma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_edma.c</FilePath>
+            </File>
+            <File>
+              <FileName>at32f435_437_emac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_emac.c</FilePath>
+            </File>
+            <File>
+              <FileName>at32f435_437_exint.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_exint.c</FilePath>
+            </File>
+            <File>
+              <FileName>at32f435_437_xmc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_xmc.c</FilePath>
+            </File>
+            <File>
+              <FileName>at32f435_437_misc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\AT32F435_437_Firmware_Library\drivers\src\at32f435_437_misc.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3167,6 +3112,71 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>POSIX</GroupName>
+          <Files>
+            <File>
+              <FileName>poll.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\components\libc\posix\io\poll\poll.c</FilePath>
+            </File>
+            <File>
+              <FileName>select.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\components\libc\posix\io\poll\select.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>rt_usbh</GroupName>
+          <Files>
+            <File>
+              <FileName>mass.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\components\legacy\usb\usbhost\class\mass.c</FilePath>
+            </File>
+            <File>
+              <FileName>hub.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\components\legacy\usb\usbhost\core\hub.c</FilePath>
+            </File>
+            <File>
+              <FileName>udisk.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\components\legacy\usb\usbhost\class\udisk.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbhost_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\components\legacy\usb\usbhost\core\usbhost_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbhost.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\components\legacy\usb\usbhost\core\usbhost.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\components\legacy\usb\usbhost\core\driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>rndis_dev.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\components\legacy\usb\usbhost\class\rndis_dev.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbh_rndis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\components\legacy\usb\usbhost\class\usbh_rndis.c</FilePath>
+            </File>
+            <File>
+              <FileName>toolkit.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\toolkit\toolkit.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>SAL</GroupName>
           <Files>
             <File>
@@ -3215,24 +3225,49 @@
               <FilePath>packages\tinycrypt-latest\src\tiny_sha2.c</FilePath>
             </File>
             <File>
+              <FileName>tiny_base64.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>packages\tinycrypt-latest\src\tiny_base64.c</FilePath>
+            </File>
+            <File>
               <FileName>tiny_aes.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\tinycrypt-latest\src\tiny_aes.c</FilePath>
             </File>
             <File>
-              <FileName>tiny_base64.c</FileName>
+              <FileName>tiny_sha1.c</FileName>
               <FileType>1</FileType>
-              <FilePath>packages\tinycrypt-latest\src\tiny_base64.c</FilePath>
+              <FilePath>packages\tinycrypt-latest\src\tiny_sha1.c</FilePath>
             </File>
             <File>
               <FileName>tiny_md5.c</FileName>
               <FileType>1</FileType>
               <FilePath>packages\tinycrypt-latest\src\tiny_md5.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>usbotg_library</GroupName>
+          <Files>
             <File>
-              <FileName>tiny_sha1.c</FileName>
+              <FileName>usbh_ctrl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>packages\tinycrypt-latest\src\tiny_sha1.c</FilePath>
+              <FilePath>..\libraries\usbotg_library\src\usbh_ctrl.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbh_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\usbotg_library\src\usbh_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\usbotg_library\src\usb_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbh_int.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\libraries\usbotg_library\src\usbh_int.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3240,9 +3275,9 @@
           <GroupName>WebClient</GroupName>
           <Files>
             <File>
-              <FileName>webclient.c</FileName>
+              <FileName>webclient_file.c</FileName>
               <FileType>1</FileType>
-              <FilePath>packages\webclient-v2.1.2\src\webclient.c</FilePath>
+              <FilePath>packages\webclient-v2.1.2\src\webclient_file.c</FilePath>
             </File>
             <File>
               <FileName>webclient_get_sample.c</FileName>
@@ -3255,9 +3290,9 @@
               <FilePath>packages\webclient-v2.1.2\samples\webclient_post_sample.c</FilePath>
             </File>
             <File>
-              <FileName>webclient_file.c</FileName>
+              <FileName>webclient.c</FileName>
               <FileType>1</FileType>
-              <FilePath>packages\webclient-v2.1.2\src\webclient_file.c</FilePath>
+              <FilePath>packages\webclient-v2.1.2\src\webclient.c</FilePath>
             </File>
           </Files>
         </Group>

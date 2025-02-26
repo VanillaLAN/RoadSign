@@ -190,8 +190,8 @@ rt_err_t rt_udisk_run(struct uhintf* intf)
 {
     int i = 0;
     rt_err_t ret;
-    char dname[8];
-    char sname[8];
+    char dname[9] = {0};
+    char sname[9] = {0};
     rt_uint8_t max_lun, *sector, sense[18], inquiry[36];
     struct dfs_partition part[MAX_PARTITION_COUNT];
     ustor_t stor;

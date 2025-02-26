@@ -96,6 +96,11 @@ void usbh_irq_handler(otg_core_type *otgdev)
     {
       usb_global_clear_interrupt(usbx, USB_OTG_ISOOUTDROP_FLAG);
     }
+	if(intsts & USB_OTG_NPTXFEMP_FLAG)
+    {
+		/* Nonperiodic TxFIFO empty interrupt */
+		usb_global_clear_interrupt(usbx, USB_OTG_NPTXFEMP_FLAG);
+    }
 
   }
 }
@@ -161,6 +166,7 @@ void usbh_hch_in_handler(usbh_core_type *uhost, uint8_t chn)
   if( hcint_value & USB_OTG_HC_ACK_FLAG)
   {
     usb_chh->hcint = USB_OTG_HC_ACK_FLAG;
+    rt_kprintf("IN %d ACK:%X\n", chn, usb_chh->hctsiz);
   }
   else if(hcint_value & USB_OTG_HC_STALL_FLAG)
   {
@@ -187,10 +193,6 @@ void usbh_hch_in_handler(usbh_core_type *uhost, uint8_t chn)
   {
     uhost->hch[chn].state = HCH_XFRC;
     uhost->err_cnt[chn] = 0;
-    if(uhost->dma_en == TRUE)
-    {
-       uhost->hch[chn].trans_count = uhost->hch[chn].trans_len - usb_chh->hctsiz_bit.xfersize;
-    }
     usb_chh->hcint = USB_OTG_HC_XFERC_FLAG;
 
     if(usb_chh->hcchar_bit.eptype == EPT_BULK_TYPE || usb_chh->hcchar_bit.eptype == EPT_CONTROL_TYPE)
@@ -201,9 +203,25 @@ void usbh_hch_in_handler(usbh_core_type *uhost, uint8_t chn)
     }
     else if(usb_chh->hcchar_bit.eptype == EPT_INT_TYPE)
     {
-      usb_chh->hcchar_bit.oddfrm = TRUE;
       uhost->urb_state[chn] = URB_DONE;
-
+      if(uhost->dma_en == FALSE)
+      {
+        usb_chh->hcchar_bit.oddfrm = TRUE;
+        uhost->hch[chn].toggle_in ^= 1U;
+      }
+      else
+      {
+        uint32_t num_packets = (uint16_t)((uhost->hch[chn].trans_len + uhost->hch[chn].maxpacket - 1U) / uhost->hch[chn].maxpacket);
+        uint32_t has_sent_packets = num_packets - usb_chh->hctsiz_bit.pktcnt;
+        uhost->hch[chn].trans_count += uhost->hch[chn].trans_len - usb_chh->hctsiz_bit.xfersize;
+        if(has_sent_packets % 2 == 1)
+        {
+          usb_chh->hcchar_bit.oddfrm = TRUE;
+          uhost->hch[chn].toggle_in ^= 1U; 
+        }
+      }  
+      rt_kprintf("IN %d URB_DONE recv:%d ,tgl_in:%d at interrupt!\n", chn, uhost->hch[chn].trans_count, uhost->hch[chn].toggle_in);
+			
       usbd_notify_urbchange_callback(uhost, chn, uhost->urb_state[chn]);
     }
     else if(usb_chh->hcchar_bit.eptype == EPT_ISO_TYPE)
@@ -222,13 +240,27 @@ void usbh_hch_in_handler(usbh_core_type *uhost, uint8_t chn)
     {
       uhost->hch[chn].toggle_in ^= 1;
     }
+    rt_kprintf("IN %d XFRC recv:%d\n", chn, uhost->hch[chn].trans_count);
   }
   else if(hcint_value & USB_OTG_HC_CHHLTD_FLAG)
   {
     usb_chh->hcintmsk_bit.chhltdmsk = FALSE;
     if(uhost->hch[chn].state == HCH_XFRC )
     {
-      uhost->urb_state[chn]  = URB_DONE;
+      if(uhost->dma_en == TRUE)
+      {
+        /*use the dma, change the toggle in*/
+        uint32_t num_packets = (uint16_t)(((uhost->hch[chn].trans_len == 0 ? 1: uhost->hch[chn].trans_len) + 
+                                              uhost->hch[chn].maxpacket - 1U) / uhost->hch[chn].maxpacket);
+        uint32_t has_sent_packets = num_packets - usb_chh->hctsiz_bit.pktcnt;
+        uhost->hch[chn].trans_count += uhost->hch[chn].trans_len - usb_chh->hctsiz_bit.xfersize;
+        if(has_sent_packets % 2 == 1)
+        {
+          uhost->hch[chn].toggle_in ^= 1U; 
+        }
+      }
+			uhost->urb_state[chn]  = URB_DONE;
+			rt_kprintf("IN %d URB_DONE recv:%d, tgl_in:%d\n", chn, uhost->hch[chn].trans_count,uhost->hch[chn].toggle_in);
     }
     else if(uhost->hch[chn].state == HCH_STALL)
     {
@@ -247,15 +279,26 @@ void usbh_hch_in_handler(usbh_core_type *uhost, uint8_t chn)
       {
         uhost->urb_state[chn] = URB_NOTREADY;
       }
+			
+			/* re-activate the channel  */
       usb_chh->hcchar_bit.chdis = FALSE;
       usb_chh->hcchar_bit.chena = TRUE;
     }
     else if(uhost->hch[chn].state == HCH_NAK)
     {
+      /* re-activate the channel  */
       usb_chh->hcchar_bit.chdis = FALSE;
       usb_chh->hcchar_bit.chena = TRUE;
       uhost->urb_state[chn] = URB_NOTREADY;
+//      rt_kprintf("IN %d  Nak re acktive\n", chn);
     }
+	else
+	{
+      /* this usb urb_state is idle, re-activate the channel. 
+         use the L501C 4D0103 test enter there, L501C 2B0402 no enter zhaoshimin 20211120*/
+      usb_chh->hcchar_bit.chdis = FALSE;
+      usb_chh->hcchar_bit.chena = TRUE;
+	}
     usb_chh->hcint = USB_OTG_HC_CHHLTD_FLAG;
     usbd_notify_urbchange_callback(uhost, chn, uhost->urb_state[chn]);
   }
@@ -321,6 +364,7 @@ void usbh_hch_out_handler(usbh_core_type *uhost, uint8_t chn)
       usb_hch_halt(usbx, chn);
     }
 #endif
+	rt_kprintf("OUT %d ACK\n", chn);
   }
   else if( hcint_value & USB_OTG_HC_FRMOVRRUN_FLAG)
   {
@@ -343,6 +387,11 @@ void usbh_hch_out_handler(usbh_core_type *uhost, uint8_t chn)
     usb_hch_halt(usbx, chn);
     uhost->hch[chn].state = HCH_XFRC;
     usb_chh->hcint = USB_OTG_HC_XFERC_FLAG;
+		if(uhost->dma_en == FALSE)
+    {
+      uhost->hch[chn].trans_count = uhost->hch[chn].trans_len;
+    }
+    rt_kprintf("OUT %d XFRC\n", chn);
   }
   else if( hcint_value & USB_OTG_HC_STALL_FLAG)
   {
@@ -368,18 +417,53 @@ void usbh_hch_out_handler(usbh_core_type *uhost, uint8_t chn)
     usb_hch_halt(usbx, chn);
     usb_chh->hcint = USB_OTG_HC_DTGLERR_FLAG | USB_OTG_HC_NAK_FLAG;
     uhost->hch[chn].state = HCH_DATATGLERR;
+		rt_kprintf("OUT %d DTRERR\n", chn);
   }
   else if( hcint_value & USB_OTG_HC_CHHLTD_FLAG)
   {
     usb_chh->hcintmsk_bit.chhltdmsk = FALSE;
+		usbx->gintmsk_bit.nptxfempmsk = FALSE;
+		usbx->gintmsk_bit.ptxfempmsk = FALSE;
+		
     if(uhost->hch[chn].state == HCH_XFRC)
     {
       uhost->urb_state[chn] = URB_DONE;
       if(uhost->hch[chn].ept_type == EPT_BULK_TYPE ||
-        uhost->hch[chn].ept_type == EPT_INT_TYPE)
+        uhost->hch[chn].ept_type == EPT_INT_TYPE ||
+        uhost->hch[chn].ept_type == EPT_CONTROL_TYPE)
       {
-        uhost->hch[chn].toggle_out ^= 1;
+				if(uhost->dma_en)
+        { 
+          /*DMA enable */
+          uint32_t num_packets = (uint16_t)(((uhost->hch[chn].trans_len == 0 ? 1: uhost->hch[chn].trans_len) + 
+                                              uhost->hch[chn].maxpacket - 1U) / uhost->hch[chn].maxpacket);
+
+          uint32_t count = usb_chh->hctsiz_bit.xfersize; /* last send size */
+
+          if (count == uhost->hch[chn].maxpacket) {
+              uhost->hch[chn].trans_count += num_packets * uhost->hch[chn].maxpacket;
+          } else {
+              uhost->hch[chn].trans_count += (num_packets - 1) * uhost->hch[chn].maxpacket + count;
+          }
+
+          if(uhost->hch[chn].ept_type != EPT_CONTROL_TYPE)
+          {
+            if(num_packets % 2 == 1)
+            {
+              uhost->hch[chn].toggle_out ^= 1U;   
+            }
+          }
+           
+        }
+        else
+        {       
+          if(uhost->hch[chn].ept_type != EPT_CONTROL_TYPE)
+          { 
+            uhost->hch[chn].toggle_out ^= 1U;
+          }  
+        }
       }
+      rt_kprintf("OUT %d xfc:%d, tgl_out:%d\n", chn, uhost->hch[chn].trans_count, uhost->hch[chn].toggle_out);
     }
     else if(uhost->hch[chn].state == HCH_NAK || uhost->hch[chn].state == HCH_NYET)
     {
@@ -404,7 +488,8 @@ void usbh_hch_out_handler(usbh_core_type *uhost, uint8_t chn)
         uhost->urb_state[chn] = URB_NOTREADY;
       }
 
-      usb_chh->hcchar_bit.chdis = FALSE;
+      /* re-activate the channel  */
+			usb_chh->hcchar_bit.chdis = FALSE;
       usb_chh->hcchar_bit.chena = TRUE;
     }
     usb_chh->hcint = USB_OTG_HC_CHHLTD_FLAG;
@@ -450,6 +535,7 @@ void usbh_hch_out_handler(usbh_core_type *uhost, uint8_t chn)
       }
     }
 #endif
+		rt_kprintf("OUT %d NAK\n", chn);
   }
 }
 
@@ -519,6 +605,13 @@ void usbh_rx_qlvl_handler(usbh_core_type *uhost)
           ch->hcchar_bit.chena = TRUE;
           uhost->hch[chn].toggle_in ^= 1;
         }
+				rt_kprintf("IN %d RXQLVL:%d, PID:%d\n", chn, pktcnt, (USB_OTG_GRXSTSP_DPID & tmp) >> 15);
+      }
+			else
+      {
+         /*如果主机接收的包长为最大包长的整数倍，设备最后会发送一个0包长的数据数据表示数据发送完成，这里要对数据包状态进行变化，并且不再使能接收通道*/
+         uhost->hch[chn].toggle_in ^= 1U;
+         rt_kprintf("ZIN %d RXQLVL:%d, PID:%d\n", chn, pktcnt, (USB_OTG_GRXSTSP_DPID & tmp) >> 15);     
       }
       break;
     case PKTSTS_IN_TRANSFER_COMPLETE:
@@ -551,6 +644,7 @@ void usbh_port_handler(usbh_core_type *uhost)
 
   prt_0 &= ~(USB_OTG_HPRT_PRTENA | USB_OTG_HPRT_PRTENCHNG |
                USB_OTG_HPRT_PRTOVRCACT | USB_OTG_HPRT_PRTCONDET);
+  rt_kprintf("HPRT0:%x\n", prt_0);
   if(prt & USB_OTG_HPRT_PRTCONDET)
   {
     if(prt & USB_OTG_HPRT_PRTCONSTS)
@@ -558,8 +652,9 @@ void usbh_port_handler(usbh_core_type *uhost)
       /* connect callback */
       uhost->conn_sts = 1;
     }
-
-    usbh_connect_callback(uhost);
+		
+		rt_kprintf("connet PCDET\n");
+		usbh_connect_callback(uhost);
     prt_0 |= USB_OTG_HPRT_PRTCONDET;
   }
 
@@ -583,11 +678,13 @@ void usbh_port_handler(usbh_core_type *uhost)
       }
       /* connect callback */
       uhost->port_enable = 1;
+      rt_kprintf("Port enable\n");    
     }
     else
     {
       /* clean up hprt */
       uhost->port_enable = 0;
+      rt_kprintf("Port Disable\n");
     }
   }
 

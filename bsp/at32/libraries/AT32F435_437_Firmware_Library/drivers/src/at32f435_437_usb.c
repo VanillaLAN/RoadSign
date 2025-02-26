@@ -1,6 +1,8 @@
 /**
   **************************************************************************
   * @file     at32f435_437_usb.c
+  * @version  v2.0.7
+  * @date     2022-04-02
   * @brief    contains all the functions for the usb firmware library
   **************************************************************************
   *                       Copyright notice & Disclaimer
@@ -40,6 +42,9 @@
   */
 
 #ifdef OTGFS_USB_GLOBAL
+#define USB_OTG_GAHBCFG_DMAEN_Pos                (5U)                          
+#define USB_OTG_GAHBCFG_DMAEN_Msk                (0x1UL << USB_OTG_GAHBCFG_DMAEN_Pos) /*!< 0x00000020 */
+#define USB_OTG_GAHBCFG_DMAEN                    USB_OTG_GAHBCFG_DMAEN_Msk     /*!< DMA enable */
 /**
   * @brief  usb global core soft reset
   * @param  usbx: to select the otgfs peripheral.
@@ -445,7 +450,6 @@ void usb_read_packet(otg_global_type *usbx, uint8_t *pusr_buf, uint16_t num, uin
   uint32_t n_index;
   uint32_t nhbytes = (nbytes + 3) / 4;
   uint32_t *pbuf = (uint32_t *)pusr_buf;
-  UNUSED(num);
   for(n_index = 0; n_index < nhbytes; n_index ++)
   {
 #if defined (__ICCARM__) && (__VER__ < 7000000)
@@ -902,23 +906,49 @@ void usb_hc_enable(otg_global_type *usbx,
 {
   otg_hchannel_type *hch = USB_CHL(usbx, chn);
   otg_host_type *usb_host = OTG_HOST(usbx);
+  uint32_t IntMask = 0;
 
+  /* Enable channel interrupts required for this transfer. */
+  IntMask = USB_OTG_HC_XFERCM_INT  |
+            USB_OTG_HC_STALLM_INT |
+            USB_OTG_HC_XFERCM_INT |
+            USB_OTG_HC_DTGLERRM_INT;
   switch(type)
   {
     case EPT_CONTROL_TYPE:
     case EPT_BULK_TYPE:
-      hch->hcintmsk |= USB_OTG_HC_XFERCM_INT | USB_OTG_HC_STALLM_INT |
-                       USB_OTG_HC_XACTERRM_INT | USB_OTG_HC_NAKM_INT |
-                       USB_OTG_HC_DTGLERRM_INT;
+      if ((usbx->gahbcfg & USB_OTG_GAHBCFG_DMAEN) != USB_OTG_GAHBCFG_DMAEN)
+      {
+        /*Dma disable, enable NAKM*/
+        IntMask |=  USB_OTG_HC_NAKM_INT; 
+      }
+			
       if(ept_num & 0x80)
       {
-        hch->hcintmsk_bit.bblerrmsk = TRUE;
+        IntMask |= USB_OTG_HC_BBLERRM_INT;
       }
+      else
+      {
+        if ((usbx->guid & (0x1U << 8)) != 0U)
+        {
+          /*High speed USB CID:0x1100, Full speed USB CID:0x1200 */
+          IntMask |= (USB_OTG_HC_NYETM_INT | USB_OTG_HC_ACKM_INT);
+        }
+      }
+      hch->hcintmsk = IntMask;
       break;
     case EPT_INT_TYPE:
-      hch->hcintmsk |= USB_OTG_HC_XFERCM_INT | USB_OTG_HC_STALLM_INT |
-                       USB_OTG_HC_XACTERRM_INT | USB_OTG_HC_NAKM_INT |
-                       USB_OTG_HC_DTGLERRM_INT | USB_OTG_HC_FRMOVRRUN_INT;
+      if ((usbx->gahbcfg & USB_OTG_GAHBCFG_DMAEN) != USB_OTG_GAHBCFG_DMAEN)
+      {
+        /*Dma disable, enable NAKM*/
+        IntMask |=  USB_OTG_HC_NAKM_INT; 
+      }
+      IntMask |=  USB_OTG_HC_FRMOVRRUN_INT; 
+      if(ept_num & 0x80)
+      {
+        IntMask |= USB_OTG_HC_BBLERRM_INT;
+      }
+      hch->hcintmsk = IntMask;
       break;
     case EPT_ISO_TYPE:
 
@@ -1013,34 +1043,46 @@ void usb_hch_halt(otg_global_type *usbx, uint8_t chn)
   uint32_t count = 0;
   otg_hchannel_type *usb_chh = USB_CHL(usbx, chn);
   otg_host_type *usb_host = OTG_HOST(usbx);
+	uint32_t ChannelEna = usb_chh->hcchar_bit.chena;
+
+  if (((usbx->gahbcfg & USB_OTG_GAHBCFG_DMAEN) == USB_OTG_GAHBCFG_DMAEN) &&
+        (ChannelEna == 0U)) 
+  {
+    return;
+  }
 
   /* endpoint type is control or bulk */
   if(usb_chh->hcchar_bit.eptype == EPT_CONTROL_TYPE ||
      usb_chh->hcchar_bit.eptype == EPT_BULK_TYPE)
   {
     usb_chh->hcchar_bit.chdis = TRUE;
-    if((usbx->gnptxsts_bit.nptxqspcavail) == 0)
+    if ((usbx->gahbcfg & USB_OTG_GAHBCFG_DMAEN) != USB_OTG_GAHBCFG_DMAEN)
     {
-      usb_chh->hcchar_bit.chena = FALSE;
-      usb_chh->hcchar_bit.chena = TRUE;
-      do
-      {
-        if(count ++ > 1000)
-          break;
-      }while(usb_chh->hcchar_bit.chena == SET);
-    }
-    else
-    {
-      usb_chh->hcchar_bit.chena = TRUE;
-    }
+			if((usbx->gnptxsts & 0xFFFF) == 0)
+			{
+				usb_chh->hcchar_bit.chena = FALSE;
+				usb_chh->hcchar_bit.chena = TRUE;
+				usb_chh->hcchar_bit.eptdir = 0;
+				do
+				{
+					if(count ++ > 1000)
+						break;
+				}while(usb_chh->hcchar_bit.chena == SET);
+			}
+			else
+			{
+				usb_chh->hcchar_bit.chena = TRUE;
+			}
+		}
   }
   else
   {
     usb_chh->hcchar_bit.chdis = TRUE;
-    if((usb_host->hptxsts_bit.ptxqspcavil) == 0)
+    if((usb_host->hptxsts & 0xFFFF) == 0)
     {
       usb_chh->hcchar_bit.chena = FALSE;
       usb_chh->hcchar_bit.chena = TRUE;
+      usb_chh->hcchar_bit.eptdir = 0;
       do
       {
         if(count ++ > 1000)
