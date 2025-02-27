@@ -216,16 +216,20 @@ int lwip_netdev_ping(struct netdev *netif, const char *host, size_t data_len,
     int s, ttl, recv_len, result = 0;
     int elapsed_time;
     rt_tick_t recv_start_tick;
-#if LWIP_VERSION_MAJOR == 1U /* v1.x */
-    int recv_timeout = timeout;
-#else /* >= v2.x */
-    struct timeval recv_timeout = { timeout / 1000UL, timeout % 1000UL * 1000 };
-#endif
+
     ip_addr_t target_addr;
     struct addrinfo hint, *res = RT_NULL;
     struct sockaddr_in *h = RT_NULL;
     struct in_addr ina;
     struct sockaddr_in local;
+
+#if LWIP_VERSION_MAJOR >= 2U
+    struct timeval recv_timeout = { 0, 0 };
+    recv_timeout.tv_sec = timeout / RT_TICK_PER_SECOND;
+    recv_timeout.tv_usec = timeout % RT_TICK_PER_SECOND;
+#else
+    int recv_timeout = timeout * 1000UL / RT_TICK_PER_SECOND;
+#endif    
 
     RT_ASSERT(netif);
     RT_ASSERT(host);
@@ -300,6 +304,8 @@ void lwip_netdev_netstat(struct netdev *netif)
 {
     extern void list_tcps(void);
     extern void list_udps(void);
+    uint32_t    counter = 0;
+    rt_device_t eth_handle = RT_NULL;
 
 #ifdef RT_LWIP_TCP
     list_tcps();
@@ -307,6 +313,17 @@ void lwip_netdev_netstat(struct netdev *netif)
 #ifdef RT_LWIP_UDP
     list_udps();
 #endif
+    /*show net send frame counter */
+    eth_handle = rt_device_find(netif->name);
+    if((eth_handle) && (RT_EOK == rt_device_control(eth_handle, NIOTCTL_GTXCOUNTER, &counter)))
+    {
+        rt_kprintf("send packet counter:%d\n", counter);    
+    }
+
+    if((eth_handle) && (RT_EOK == rt_device_control(eth_handle, NIOTCTL_GTXCOUNTER, &counter)))
+    {
+        rt_kprintf("recv packet counter:%d\n", counter);    
+    }
 }
 #endif /* RT_LWIP_TCP || RT_LWIP_UDP */
 #endif /* RT_USING_FINSH */
@@ -394,6 +411,10 @@ static int netdev_flags_sync(struct netif *lwip_netif)
     return ERR_OK;
 }
 
+#ifdef SAL_USING_LWIP
+    extern int sal_lwip_netdev_set_pf_info(struct netdev *netdev);
+#endif
+
 static int netdev_add(struct netif *lwip_netif)
 {
     int result = 0;
@@ -409,7 +430,6 @@ static int netdev_add(struct netif *lwip_netif)
     }
 
 #ifdef SAL_USING_LWIP
-    extern int sal_lwip_netdev_set_pf_info(struct netdev *netdev);
     /* set the lwIP network interface device protocol family information */
     sal_lwip_netdev_set_pf_info(netdev);
 #endif /* SAL_USING_LWIP */

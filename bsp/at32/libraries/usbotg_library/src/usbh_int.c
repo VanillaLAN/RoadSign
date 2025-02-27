@@ -96,10 +96,10 @@ void usbh_irq_handler(otg_core_type *otgdev)
     {
       usb_global_clear_interrupt(usbx, USB_OTG_ISOOUTDROP_FLAG);
     }
-	if(intsts & USB_OTG_NPTXFEMP_FLAG)
+    if(intsts & USB_OTG_NPTXFEMP_FLAG)
     {
-		/* Nonperiodic TxFIFO empty interrupt */
-		usb_global_clear_interrupt(usbx, USB_OTG_NPTXFEMP_FLAG);
+      /* Nonperiodic TxFIFO empty interrupt */
+      usb_global_clear_interrupt(usbx, USB_OTG_NPTXFEMP_FLAG);
     }
 
   }

@@ -159,7 +159,7 @@ static rt_err_t rt_rndis_msg_query(struct uhintf* intf, rt_uint32_t oid, rt_uint
 {
     rndis_query_msg_t    pquery_msg = RT_NULL;
     rndis_query_cmplt_t  pquery_cmplt = RT_NULL;
-    rt_uint32_t recv_len = 256, request_id = 0;
+    rt_uint32_t recv_len = 512, request_id = 0;//rt_uint32_t recv_len = 256, request_id = 0;
     int ret = 0;
     rt_uint32_t oid_buf_len = 0;
     urndis_t rndis = RT_NULL;
@@ -582,7 +582,7 @@ rt_err_t rt_rndis_run(struct uhintf* intf)
     rt_err_t ret = 0;
     urndis_t rndis = RT_NULL;
     rt_uint8_t *recv_buf = RT_NULL;
-    rt_uint32_t recv_len = 256;
+    rt_uint32_t recv_len = 512;//256;
     rt_uint32_t *psupport_oid_list = RT_NULL;
     rt_uint32_t *poid = RT_NULL;
     rt_uint32_t *pquery_rlt = RT_NULL;
