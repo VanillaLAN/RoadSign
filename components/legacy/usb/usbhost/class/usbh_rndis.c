@@ -12,7 +12,7 @@
 #include <drivers/usb_host.h>
 #include "usbh_rndis.h"
 #include "rndis_dev.h"
-#include <rtdbg.h>
+//#include <rtdbg.h>
 
 #ifdef RT_USBH_RNDIS
 
@@ -20,7 +20,7 @@ extern rt_err_t rt_rndis_run(struct uhintf* intf);
 extern rt_err_t rt_rndis_stop(struct uhintf* intf);
 
 static struct uclass_driver rndis_driver;
-
+#define LOG_D rt_kprintf
 /**
  * This function will do send control out data to the usb device instance,
  *

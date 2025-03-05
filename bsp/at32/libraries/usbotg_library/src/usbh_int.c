@@ -229,17 +229,7 @@ void usbh_hch_in_handler(usbh_core_type *uhost, uint8_t chn)
       uhost->urb_state[chn] = URB_DONE;
       usbd_notify_urbchange_callback(uhost, chn, uhost->urb_state[chn]);
     }
-    if(uhost->dma_en == TRUE)
-    {
-      if(((uhost->hch[chn].trans_len / uhost->hch[chn].maxpacket) & 1) != 0)
-      {
-        uhost->hch[chn].toggle_in ^= 1;
-      }
-    }
-    else
-    {
-      uhost->hch[chn].toggle_in ^= 1;
-    }
+
     rt_kprintf("IN %d XFRC recv:%d\n", chn, uhost->hch[chn].trans_count);
   }
   else if(hcint_value & USB_OTG_HC_CHHLTD_FLAG)
@@ -290,15 +280,15 @@ void usbh_hch_in_handler(usbh_core_type *uhost, uint8_t chn)
       usb_chh->hcchar_bit.chdis = FALSE;
       usb_chh->hcchar_bit.chena = TRUE;
       uhost->urb_state[chn] = URB_NOTREADY;
-//      rt_kprintf("IN %d  Nak re acktive\n", chn);
+      //rt_kprintf("IN %d  Nak re acktive\n", chn);
     }
-	else
-	{
-      /* this usb urb_state is idle, re-activate the channel. 
-         use the L501C 4D0103 test enter there, L501C 2B0402 no enter zhaoshimin 20211120*/
-      usb_chh->hcchar_bit.chdis = FALSE;
-      usb_chh->hcchar_bit.chena = TRUE;
-	}
+    else
+    {
+        /* this usb urb_state is idle, re-activate the channel. 
+            use the L501C 4D0103 test enter there, L501C 2B0402 no enter zhaoshimin 20211120*/
+        usb_chh->hcchar_bit.chdis = FALSE;
+        usb_chh->hcchar_bit.chena = TRUE;
+    }
     usb_chh->hcint = USB_OTG_HC_CHHLTD_FLAG;
     usbd_notify_urbchange_callback(uhost, chn, uhost->urb_state[chn]);
   }
@@ -463,7 +453,7 @@ void usbh_hch_out_handler(usbh_core_type *uhost, uint8_t chn)
           }  
         }
       }
-      rt_kprintf("OUT %d xfc:%d, tgl_out:%d\n", chn, uhost->hch[chn].trans_count, uhost->hch[chn].toggle_out);
+      //rt_kprintf("OUT %d xfc:%d, tgl_out:%d\n", chn, uhost->hch[chn].trans_count, uhost->hch[chn].toggle_out);
     }
     else if(uhost->hch[chn].state == HCH_NAK || uhost->hch[chn].state == HCH_NYET)
     {
@@ -480,8 +470,7 @@ void usbh_hch_out_handler(usbh_core_type *uhost, uint8_t chn)
       if(uhost->err_cnt[chn] > 3)
       {
         uhost->urb_state[chn] = URB_ERROR;
-        uhost->err_cnt[chn] = 0;
-        usbd_notify_urbchange_callback(uhost, chn, uhost->urb_state[chn]);
+        uhost->err_cnt[chn] = 0;usbd_notify_urbchange_callback(uhost, chn, uhost->urb_state[chn]);
       }
       else
       {

@@ -59,7 +59,7 @@ extern "C" {
 /**
   * @brief usb host mode config
   */
-#define USB_HOST_CHANNEL_NUM            8//16
+#define USB_HOST_CHANNEL_NUM            16
 
 /* otg1 host fifo */
 #define USBH_RX_FIFO_SIZE               128

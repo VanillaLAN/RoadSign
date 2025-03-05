@@ -952,8 +952,14 @@ void usb_hc_enable(otg_global_type *usbx,
       break;
     case EPT_ISO_TYPE:
 
-      hch->hcintmsk |= USB_OTG_HC_XFERCM_INT | USB_OTG_HC_ACKM_INT |
+//      hch->hcintmsk |= USB_OTG_HC_XFERCM_INT | USB_OTG_HC_ACKM_INT |
+//                       USB_OTG_HC_FRMOVRRUN_INT;
+      hch->hcintmsk = USB_OTG_HC_XFERCM_INT | USB_OTG_HC_ACKM_INT |
                        USB_OTG_HC_FRMOVRRUN_INT;
+      if(ept_num & 0x80)
+      {
+        IntMask |= USB_OTG_HC_BBLERRM_INT;
+      }
       break;
   }
   usb_host->haintmsk |= 1 << chn;

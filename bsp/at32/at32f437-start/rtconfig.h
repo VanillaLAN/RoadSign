@@ -73,6 +73,9 @@
 #define RT_USING_IDLE_HOOK
 #define RT_IDLE_HOOK_LIST_SIZE 4
 #define IDLE_THREAD_STACK_SIZE 1024
+#define RT_USING_TIMER_SOFT
+#define RT_TIMER_THREAD_PRIO 7
+#define RT_TIMER_THREAD_STACK_SIZE 1024
 
 /* kservice options */
 
@@ -284,9 +287,10 @@
 #define RT_USBH_MSTORAGE
 #define UDISK_MOUNTPOINT "/"
 #define RT_USBD_THREAD_STACK_SZ 4096
-/* end of Using USB legacy version */
+
 #define RT_USBH_RNDIS
 #define RT_USBH_RNDIS_DEV
+/* end of Using USB legacy version */
 /* end of RT-Thread Components */
 
 /* RT-Thread Utestcases */

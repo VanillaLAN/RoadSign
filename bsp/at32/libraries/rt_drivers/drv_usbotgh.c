@@ -74,7 +74,7 @@ void OTGFS2_IRQHandler(void)
 void usbh_connect_callback(usbh_core_type *uhost)
 {
     uhcd_t hcd = (uhcd_t)uhost->pdata;
-	rt_kprintf("time:%dms, connect %d\n", rt_tick_get(), connect_status);
+    rt_kprintf("time:%dms, connect %d\n", rt_tick_get(), connect_status);
     if (!connect_status)
     {
         connect_status = RT_TRUE;
@@ -86,7 +86,7 @@ void usbh_connect_callback(usbh_core_type *uhost)
 void usbh_disconnect_callback(usbh_core_type *uhost)
 {
     uhcd_t hcd = (uhcd_t)uhost->pdata;
-	rt_kprintf("time:%dms disconnect %d\n", rt_tick_get(),connect_status);
+    rt_kprintf("time:%dms disconnect %d\n", rt_tick_get(),connect_status);
     if (connect_status)
     {
         connect_status = RT_FALSE;
@@ -97,7 +97,7 @@ void usbh_disconnect_callback(usbh_core_type *uhost)
 
 void usbd_notify_urbchange_callback(usbh_core_type *uhost, uint8_t chnum, urb_sts_type sts)
 {
-	/*  when use the L501 4D0103 usb urb_state is idle, L501 2B0402 no enter zhaoshimin 20211120*/
+    /*  when use the L501 4D0103 usb urb_state is idle, L501 2B0402 no enter zhaoshimin 20211120*/
     if((sts != URB_NOTREADY) && (sts != URB_IDLE))
     {
         rt_sem_release(usb_urb_sem[chnum]);
@@ -130,7 +130,7 @@ void usbh_port_enable_callback(usbh_core_type *uhost)
 void usbh_port_disable_callback(usbh_core_type *uhost)
 {
     uhcd_t hcd = (uhcd_t)uhost->pdata;
-    /*port disenable*/
+    /*port disable*/
     rt_usbh_root_hub_port_disable_handler(hcd, 1);
 }
 
@@ -161,266 +161,15 @@ static rt_err_t drv_vbus_control(rt_uint8_t port, rt_uint8_t power)
     return RT_EOK;
 }
 
-//static int drv_pipe_xfer(upipe_t pipe, rt_uint8_t token, void *buffer, int nbytes, int timeouts)
-//{
-//    volatile int retry = 0;
-//	rt_int32_t tick = 0;
-//	void *pusb_buffer = RT_NULL;  // 临时缓冲区指针
-//    int len = 0;                  // 缓冲区长度计算
-//    int ret = 0;                  // 返回值变量
-//	usbh_core_type *uhost = &(p_usbotg_instance->p_otg_core->host);
-
-//	if(pipe->ep.bEndpointAddress & 0x80)
-//    {
-//        /*IN ep*/
-//        
-//        /* Because the USB bottom layer will set the receiving buffer to an integer multiple of the maximum packet length, 
-//           so the length of the receiving buffer should be  converted to an integer multiple of the maximum packet length zhaoshimin 20211119 */
-//        if((nbytes) && ((nbytes % pipe->ep.wMaxPacketSize) == 0))
-//        {
-//            pusb_buffer = buffer;
-//        }
-//        else
-//        {
-//            if(nbytes == 0)
-//            {
-//                len = pipe->ep.wMaxPacketSize;
-//            }
-//            else
-//            {
-//                len = (nbytes + pipe->ep.wMaxPacketSize - 1) / pipe->ep.wMaxPacketSize;
-//                len = len * pipe->ep.wMaxPacketSize;
-//            }
-
-//            pusb_buffer = rt_malloc(len);
-//            if(pusb_buffer == RT_NULL)
-//            {
-//                LOG_D("drv_pipe_xfer malloc: %d faile\n", len);
-//                return -1;
-//            }
-//        }
-//    }
-//    else
-//    {
-//        pusb_buffer = buffer;
-//    }    
-
-//	// 重置信号量
-//	rt_sem_control(usb_urb_sem[pipe->pipe_index], RT_IPC_CMD_RESET, RT_NULL);
-//	
-//	p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].dir = (pipe->ep.bEndpointAddress & 0x80) >> 7;
-
-//    if(token == 0U)
-//    {
-//        p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].data_pid = HCH_PID_SETUP;
-//    }
-//    else
-//    {
-//        p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].data_pid = HCH_PID_DATA1;
-//    }
-
-//    /* endpoint type */
-//    switch(pipe->ep.bmAttributes)
-//    {
-//        /* endpoint is control type */
-//        case EPT_CONTROL_TYPE:
-//            if((token == 1U) && (((pipe->ep.bEndpointAddress & 0x80) >> 7) == 0U))
-//            {
-//                if(nbytes == 0U)
-//                {
-//                    p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].toggle_out = 1U;
-//                }
-//                if((&p_usbotg_instance->p_otg_core->host)->hch[pipe->pipe_index].toggle_out == 0U)
-//                {
-//                    p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].data_pid = HCH_PID_DATA0;
-//                }
-//                else
-//                {
-//                    p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].data_pid = HCH_PID_DATA1;
-//                }
-//            }
-//            break;
-//        /* endpoint is bulk type */
-//        case EPT_BULK_TYPE:
-//            if(((pipe->ep.bEndpointAddress & 0x80) >> 7) == 0U)
-//            {
-//                if( p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].toggle_out == 0U)
-//                {
-//                    p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].data_pid = HCH_PID_DATA0;
-//                }
-//                else
-//                {
-//                    p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].data_pid = HCH_PID_DATA1;
-//                }
-//            }
-//            else
-//            {
-//                if( p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].toggle_in == 0U)
-//                {
-//                    p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].data_pid = HCH_PID_DATA0;
-//                }
-//                else
-//                {
-//                    p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].data_pid = HCH_PID_DATA1;
-//                }
-//            }
-//            break;
-//        /* endpoint is int type */
-//        case  EPT_INT_TYPE:
-//            if(((pipe->ep.bEndpointAddress & 0x80) >> 7) == 0U)
-//            {
-//                if( p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].toggle_out == 0U)
-//                {
-//                    p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].data_pid = HCH_PID_DATA0;
-//                }
-//                else
-//                {
-//                    p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].data_pid = HCH_PID_DATA1;
-//                }
-//            }
-//            else
-//            {
-//                if( p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].toggle_in == 0U)
-//                {
-//                    p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].data_pid = HCH_PID_DATA0;
-//                }
-//                else
-//                {
-//                    p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].data_pid = HCH_PID_DATA1;
-//                }
-//            }
-//            break;
-//        /* endpoint is isoc type */
-//        case EPT_ISO_TYPE:
-//            p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].data_pid = HCH_PID_DATA0;
-//            break;
-
-//        default:
-//            break;
-//    }
-
-//    /* set transfer buffer */
-//    p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].trans_buf = pusb_buffer;
-//    /* set transfer len*/
-//    p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].trans_len = nbytes;
-//    p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].urb_sts = URB_IDLE;
-//    p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].ch_num = pipe->pipe_index;
-//    p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].trans_count = 0;
-//    p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].state = HCH_IDLE;
-
-//__resend:
-//    /* data in/out for host */
-//    usbh_in_out_request((&p_usbotg_instance->p_otg_core->host), pipe->pipe_index);
-
-//	if(timeouts == 0)
-//	{
-//		tick = RT_WAITING_FOREVER;
-//	}
-//	else
-//	{
-//		tick = rt_tick_from_millisecond(timeouts);
-//	}
-// 
-//	if(-RT_ETIMEOUT == rt_sem_take(usb_urb_sem[pipe->pipe_index], tick))
-//	{
-//		rt_kprintf("sem %d timeout!\n", pipe->pipe_index);
-//		usb_hch_halt(uhost->usb_reg, pipe->pipe_index);
-//		ret =  -RT_ETIMEOUT;
-//		goto __exit;
-//	}
-
-//	if(!connect_status)
-//	{
-//		ret =  -RT_ERROR;
-//		goto __exit;
-//	}
-//	
-//	if(usbh_get_urb_status((&p_usbotg_instance->p_otg_core->host), pipe->pipe_index) == URB_NOTREADY)
-//	{
-//		LOG_D("nak\n");
-//		if (pipe->ep.bmAttributes == USB_EP_ATTR_INT)
-//		{
-//			rt_thread_delay((pipe->ep.bInterval * RT_TICK_PER_SECOND / 1000) > 0 ? (pipe->ep.bInterval * RT_TICK_PER_SECOND / 1000) : 1);
-//		}
-//		if((pipe->ep.bEndpointAddress & 0x80) == 0)
-//		{
-//			goto __resend;
-//		}
-//	}
-//	else if (usbh_get_urb_status(&p_usbotg_instance->p_otg_core->host, pipe->pipe_index) == URB_STALL)
-//	{
-//		LOG_D("stall");
-//		pipe->status = UPIPE_STATUS_STALL;
-//		if (pipe->callback != RT_NULL)
-//		{
-//			pipe->callback(pipe);
-//		}
-//		ret = -1;
-//		goto __exit;
-//	}
-//	else if (usbh_get_urb_status(&p_usbotg_instance->p_otg_core->host, pipe->pipe_index) == URB_ERROR)
-//	{
-//		LOG_D("error");
-//		pipe->status = UPIPE_STATUS_ERROR;
-//		if (pipe->callback != RT_NULL)
-//		{
-//				pipe->callback(pipe);
-//		}
-//		ret = -1;
-//		goto __exit;
-//	}
-//	else if (usbh_get_urb_status(&p_usbotg_instance->p_otg_core->host, pipe->pipe_index) == URB_DONE)
-//	{
-//		LOG_D("ok");
-//		pipe->status = UPIPE_STATUS_OK;
-//		if (pipe->callback != RT_NULL)
-//		{
-//			pipe->callback(pipe);
-//		}
-//		rt_size_t size = (&p_usbotg_instance->p_otg_core->host)->hch[pipe->pipe_index].trans_count;
-//		
-//		if ((size > 0) && (pusb_buffer != buffer) && (pusb_buffer) && (buffer))
-//		{
-//			rt_memcpy(buffer, pusb_buffer, nbytes);
-//		}
-//		
-//		if (pipe->ep.bEndpointAddress & 0x80)
-//		{
-//			ret =  size;
-//		}
-//		else
-//		{
-//			ret =  nbytes;
-//		}
-//		goto __exit;
-//	}
-//	else
-//	{
-//		LOG_D("usb status:%d\n", usb_state);
-//		
-//		usb_hch_halt(uhost->usb_reg, pipe->pipe_index);
-//		ret = 0;
-//	}
-//		
-//__exit:	//统一释放临时缓冲区，避免内存泄漏
-//    if((pusb_buffer != buffer) && (pusb_buffer))
-//    {
-//        rt_free(pusb_buffer);
-//        pusb_buffer = RT_NULL;
-//    }    
-//    return ret;
-//}
-
 static int drv_pipe_xfer(upipe_t pipe, rt_uint8_t token, void *buffer, int nbytes, int timeouts)
 {
-    volatile int retry = 0;
-	rt_int32_t tick = 0;
-	void *pusb_buffer = RT_NULL;  // 临时缓冲区指针
+    rt_int32_t tick = 0;
+    void *pusb_buffer = RT_NULL;  // 临时缓冲区指针
     int len = 0;                  // 缓冲区长度计算
     int ret = 0;                  // 返回值变量
-	usbh_core_type *uhost = &(p_usbotg_instance->p_otg_core->host);
+    usbh_core_type *uhost = &(p_usbotg_instance->p_otg_core->host);
 
-	if(pipe->ep.bEndpointAddress & 0x80)
+    if(pipe->ep.bEndpointAddress & 0x80)
     {
         /*IN ep*/
         
@@ -455,10 +204,10 @@ static int drv_pipe_xfer(upipe_t pipe, rt_uint8_t token, void *buffer, int nbyte
         pusb_buffer = buffer;
     }    
 
-	// 重置信号量
-	rt_sem_control(usb_urb_sem[pipe->pipe_index], RT_IPC_CMD_RESET, RT_NULL);
+    // 重置信号量
+    rt_sem_control(usb_urb_sem[pipe->pipe_index], RT_IPC_CMD_RESET, RT_NULL);
 	
-	p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].dir = (pipe->ep.bEndpointAddress & 0x80) >> 7;
+    p_usbotg_instance->p_otg_core->host.hch[pipe->pipe_index].dir = (pipe->ep.bEndpointAddress & 0x80) >> 7;
 
     if(token == 0U)
     {
@@ -578,15 +327,25 @@ static int drv_pipe_xfer(upipe_t pipe, rt_uint8_t token, void *buffer, int nbyte
 		goto __exit;
 	}
 
-	if(!connect_status)
-	{
-		ret =  -RT_ERROR;
-		goto __exit;
-	}
+#ifndef DRV_USBH_USE_HS    
+    if((pipe->ep.bEndpointAddress & 0x80) == 0)
+    {
+        /*OUT EP */
+        /*between twice usb out transfer, should add the less 1ms delay. 
+         if not next out transfer return NAK zhaoshimin 2021050 */
+        rt_thread_mdelay(1);
+    }
+#endif
+
+    if (!connect_status)
+    {
+        ret =  -RT_ERROR;
+        goto __exit;
+    }
 	
 	if(usbh_get_urb_status((&p_usbotg_instance->p_otg_core->host), pipe->pipe_index) == URB_NOTREADY)
 	{
-		LOG_D("nak\n");
+		LOG_D("nak");
 		if (pipe->ep.bmAttributes == USB_EP_ATTR_INT)
 		{
 			rt_thread_delay((pipe->ep.bInterval * RT_TICK_PER_SECOND / 1000) > 0 ? (pipe->ep.bInterval * RT_TICK_PER_SECOND / 1000) : 1);
@@ -644,6 +403,42 @@ __exit:	//统一释放临时缓冲区，避免内存泄漏
     return ret;
 }
 
+#ifndef DRV_USBH_USE_HS
+static int drv_pipe_xfer_shell(upipe_t pipe, rt_uint8_t token, void *buffer, int nbytes, int timeouts)
+{
+    if(pipe->ep.bEndpointAddress & 0x80)
+    {
+        /*IN EP*/
+        return drv_pipe_xfer(pipe, token, buffer, nbytes, timeouts);
+    }
+    else
+    {
+        /*OUT EP Subcontracting sending data*/
+        rt_size_t remain_size;
+        rt_size_t send_size;
+        remain_size = nbytes;
+        rt_uint8_t * pbuffer = (rt_uint8_t *)buffer;
+        do
+        {
+            send_size = (remain_size > pipe->ep.wMaxPacketSize) ? pipe->ep.wMaxPacketSize : remain_size;
+            if(drv_pipe_xfer(pipe, token, pbuffer, send_size, timeouts) == send_size)
+            {
+                remain_size -= send_size;
+                pbuffer += send_size;
+            }
+            else
+            {
+                return -1;
+            }
+        }while(remain_size > 0);
+
+        return nbytes;
+
+    }
+
+}
+#endif
+
 void usbh_loop(void)
 {
 	usbh_loop_handler(&(p_usbotg_instance->p_otg_core->host));
@@ -672,7 +467,7 @@ static void drv_free_pipe_index(rt_uint8_t index)
 static rt_err_t drv_open_pipe(upipe_t pipe)
 {
     pipe->pipe_index = drv_get_free_pipe_index();
-	if(pipe->pipe_index > USB_HOST_CHANNEL_NUM)
+    if(pipe->pipe_index > USB_HOST_CHANNEL_NUM)
     {
         return -RT_ERROR;
     }
@@ -708,10 +503,14 @@ static rt_err_t drv_close_pipe(upipe_t pipe)
 static struct uhcd_ops _uhcd_ops =
 {
     drv_reset_port,
+#ifdef DRV_USBH_USE_HS
     drv_pipe_xfer,
+#else
+    drv_pipe_xfer_shell,
+#endif
     drv_open_pipe,
     drv_close_pipe,
-	drv_vbus_control,
+    drv_vbus_control,
 };
 
 static rt_err_t at32_hcd_init(rt_device_t device)
@@ -719,7 +518,7 @@ static rt_err_t at32_hcd_init(rt_device_t device)
     rt_uint32_t i = 0;
     char sem_name[10] = {0};		
 		
-	for(i = 0; i < USB_HOST_CHANNEL_NUM; i++)
+    for(i = 0; i < USB_HOST_CHANNEL_NUM; i++)
     {
         rt_sprintf(sem_name, "urb_sem%d", i);
         usb_urb_sem[i] = rt_sem_create(sem_name, 0, RT_IPC_FLAG_FIFO);
@@ -729,13 +528,13 @@ static rt_err_t at32_hcd_init(rt_device_t device)
         }
     }
 		
-	/* usb gpio config */
+    /* usb gpio config */
     at32_msp_usb_init(device);
 
     /* enable otgfs irq */
     nvic_irq_enable(p_usbotg_instance->irqn, 2, 0);
 		
-	/* init usb */
+    /* init usb */
     usbh_init(p_usbotg_instance->p_otg_core,
               p_usbotg_instance->dev_spd,
               p_usbotg_instance->id);

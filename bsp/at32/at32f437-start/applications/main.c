@@ -17,7 +17,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "mqttclient.h"
-//#include "OneNet.h"
+#include "OneNet.h"
 
 #include "gps.h"
 #include "drv_gpio.h"
@@ -411,11 +411,11 @@ int main(void)
     uint32_t  send_len = 0;
 	uint8_t gps_rx[128];
 	
-//    ONENET_SESSION *onenet= RT_NULL;
-//    ONENET_INIT    init;
-//    char device_id[ONENET_DEVICE_ID_LEN] = {0};
-//    char api_key[ONENET_API_KEY_LEN] = {0};
-//    char *access_key = "12315642165";
+    ONENET_SESSION *onenet= RT_NULL;
+    ONENET_INIT    init;
+    char device_id[ONENET_DEVICE_ID_LEN] = {0};
+    char api_key[ONENET_API_KEY_LEN] = {0};
+    char *access_key = "12315642165";
 
     
 
@@ -534,9 +534,9 @@ int main(void)
         /*上传数据*/
 //        send_len = snprintf(data_point_buf, sizeof(data_point_buf), "{\"id\":%d, \"dp\":{\"csq\":[{\"v\":%d}]}}", i, i); 
 //        i++;
-        
+//        
 //        OneNet_session_send(onenet, data_point_buf, send_len);
-//        gps_rmc_sample_entry(gps_rx);
+////        gps_rmc_sample_entry(gps_rx);
 
 //        rt_thread_mdelay(59000);
     }    

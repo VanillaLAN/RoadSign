@@ -159,7 +159,7 @@ static rt_err_t rt_rndis_msg_query(struct uhintf* intf, rt_uint32_t oid, rt_uint
 {
     rndis_query_msg_t    pquery_msg = RT_NULL;
     rndis_query_cmplt_t  pquery_cmplt = RT_NULL;
-    rt_uint32_t recv_len = 512, request_id = 0;//rt_uint32_t recv_len = 256, request_id = 0;
+    rt_uint32_t recv_len = 256, request_id = 0;
     int ret = 0;
     rt_uint32_t oid_buf_len = 0;
     urndis_t rndis = RT_NULL;
@@ -536,7 +536,7 @@ void rndis_dev_keepalive_timeout(void *pdata)
     struct uhintf* intf = (struct uhintf* )pdata;
     urndis_t rndis = RT_NULL;
     static rt_uint32_t keepalive_error = 0;
-
+rt_kprintf("rndis1 addr = %d, hold = %d, parent name = %s\n", usbh_rndis_eth_device.dev_addr, usbh_rndis_eth_device.rndis_mutex->hold, usbh_rndis_eth_device.rndis_mutex->parent.parent.name);
 
     rndis = (urndis_t)intf->user_data;
     if((intf == RT_NULL) || (rndis == RT_NULL))
@@ -546,8 +546,9 @@ void rndis_dev_keepalive_timeout(void *pdata)
 
     if(RT_EOK == rt_rndis_keepalive_msg(intf))
     {
-        //RNDIS_DEV_PRINTF("rndis dev keepalive success!\n");
+        RNDIS_DEV_PRINTF("rndis dev keepalive success!\n");
         keepalive_error = 0;
+			
         rt_mutex_take(usbh_rndis_eth_device.rndis_mutex, RT_WAITING_FOREVER);
         if(rndis->keepalive_timer)
         {
@@ -566,7 +567,7 @@ void rndis_dev_keepalive_timeout(void *pdata)
             rndis->rndis_state = RNDIS_BUS_INITIALIZED;
         }
     }
-
+rt_kprintf("rndis2 addr = %d, hold = %d, parent name = %s\n", usbh_rndis_eth_device.dev_addr, usbh_rndis_eth_device.rndis_mutex->hold, usbh_rndis_eth_device.rndis_mutex->parent.parent.name);
 
 }
                             
@@ -582,7 +583,7 @@ rt_err_t rt_rndis_run(struct uhintf* intf)
     rt_err_t ret = 0;
     urndis_t rndis = RT_NULL;
     rt_uint8_t *recv_buf = RT_NULL;
-    rt_uint32_t recv_len = 512;//256;
+    rt_uint32_t recv_len = 256;
     rt_uint32_t *psupport_oid_list = RT_NULL;
     rt_uint32_t *poid = RT_NULL;
     rt_uint32_t *pquery_rlt = RT_NULL;
