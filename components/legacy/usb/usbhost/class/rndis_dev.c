@@ -536,7 +536,7 @@ void rndis_dev_keepalive_timeout(void *pdata)
     struct uhintf* intf = (struct uhintf* )pdata;
     urndis_t rndis = RT_NULL;
     static rt_uint32_t keepalive_error = 0;
-rt_kprintf("rndis1 addr = %d, hold = %d, parent name = %s\n", usbh_rndis_eth_device.dev_addr, usbh_rndis_eth_device.rndis_mutex->hold, usbh_rndis_eth_device.rndis_mutex->parent.parent.name);
+
 
     rndis = (urndis_t)intf->user_data;
     if((intf == RT_NULL) || (rndis == RT_NULL))
@@ -567,7 +567,7 @@ rt_kprintf("rndis1 addr = %d, hold = %d, parent name = %s\n", usbh_rndis_eth_dev
             rndis->rndis_state = RNDIS_BUS_INITIALIZED;
         }
     }
-rt_kprintf("rndis2 addr = %d, hold = %d, parent name = %s\n", usbh_rndis_eth_device.dev_addr, usbh_rndis_eth_device.rndis_mutex->hold, usbh_rndis_eth_device.rndis_mutex->parent.parent.name);
+
 
 }
                             

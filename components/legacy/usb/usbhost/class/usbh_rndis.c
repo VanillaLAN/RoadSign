@@ -12,7 +12,7 @@
 #include <drivers/usb_host.h>
 #include "usbh_rndis.h"
 #include "rndis_dev.h"
-//#include <rtdbg.h>
+#include <rtdbg.h>
 
 #ifdef RT_USBH_RNDIS
 

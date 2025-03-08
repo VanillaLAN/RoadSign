@@ -409,7 +409,6 @@ int main(void)
     int ret = 0;
     uint32_t  i = 0;
     uint32_t  send_len = 0;
-	uint8_t gps_rx[128];
 	
     ONENET_SESSION *onenet= RT_NULL;
     ONENET_INIT    init;
@@ -419,32 +418,32 @@ int main(void)
 
     
 
-//    netdev = netdev_get_by_name("u0");
-//    if (netdev == RT_NULL)
-//    {
-//        rt_kprintf("input network interface name u0 error.\n");
-//        
-//    }
-//    else
-//    {  
+    netdev = netdev_get_by_name("u0");
+    if (netdev == RT_NULL)
+    {
+        rt_kprintf("input network interface name u0 error.\n");
+        
+    }
+    else
+    {  
 
-//        /*关闭DHCP功能，设备静态IP地址*/
-//        netdev_dhcp_enabled(netdev, RT_FALSE);
+        /*关闭DHCP功能，设备静态IP地址*/
+        netdev_dhcp_enabled(netdev, RT_FALSE);
 
-//        /* set IP address */
-//        
-//        inet_aton("192.168.0.101", &addr);
-//        netdev_set_ipaddr(netdev, &addr);
+        /* set IP address */
+        
+        inet_aton("192.168.0.101", &addr);
+        netdev_set_ipaddr(netdev, &addr);
 
-//        inet_aton("192.168.0.1", &addr);
-//        netdev_set_gw(netdev, &addr);
+        inet_aton("192.168.0.1", &addr);
+        netdev_set_gw(netdev, &addr);
 
-//        inet_aton("255.255.255.0", &addr);
-//        netdev_set_netmask(netdev, &addr);
+        inet_aton("255.255.255.0", &addr);
+        netdev_set_netmask(netdev, &addr);
 
-//        inet_aton("8.8.8.8", &addr);
-//        netdev_set_dns_server(netdev, 0, &addr);
-//    }
+        inet_aton("8.8.8.8", &addr);
+        netdev_set_dns_server(netdev, 0, &addr);
+    }
     
     
     /* user app entry */
@@ -479,48 +478,48 @@ int main(void)
     
       
     
-//    init.ip = "183.230.40.96";
-//    init.port = "1883";
-//    init.device_name = "FHQLONGTENG";
-//    init.product_id = "354804";
-//    init.device_id = device_id;
-//    init.api_key = api_key;
-//    rt_thread_mdelay(5000);
-//   
-//       
-//    
-//    for(;;)
-//    {  
-//        if(RT_EOK != OneNet_device_register(init.product_id, access_key, init.device_name, device_id, sizeof(device_id), api_key, sizeof(api_key)))
-//        {
-//            LOG_E("Can not register device to platform!");
-//            rt_thread_mdelay(1000);
-//        }
-//        else
-//        {
-//            break;
-//        }  
-//    }
+    init.ip = "183.230.40.96";
+    init.port = "1883";
+    init.device_name = "FHQLONGTENG";
+    init.product_id = "354804";
+    init.device_id = device_id;
+    init.api_key = api_key;
+    rt_thread_mdelay(5000);
+   
+       
+    
+    for(;;)
+    {  
+        if(RT_EOK != OneNet_device_register(init.product_id, access_key, init.device_name, device_id, sizeof(device_id), api_key, sizeof(api_key)))
+        {
+            LOG_E("Can not register device to platform!");
+            rt_thread_mdelay(1000);
+        }
+        else
+        {
+            break;
+        }  
+    }
 
-//    onenet = OneNet_session_creat(&init);
+    onenet = OneNet_session_creat(&init);
 
-//    for(;;)
-//    {
-//        
-//        if(OneNet_connect(onenet) != RT_EOK)
-//        {
-//            rt_thread_mdelay(1000);
-//            rt_kprintf("mqtt connect fail : %d!\r\n", ret);
-//        }
-//        else
-//        {
-//            break;
-//        }
-//    }    
-//   
+    for(;;)
+    {
+        
+        if(OneNet_connect(onenet) != RT_EOK)
+        {
+            rt_thread_mdelay(1000);
+            rt_kprintf("mqtt connect fail : %d!\r\n", ret);
+        }
+        else
+        {
+            break;
+        }
+    }    
+   
 
-//    OneNet_topic_subscribe(onenet, ONENET_TOPIC_DATAPOINT);
-//    OneNet_topic_subscribe(onenet, ONENET_TOPIC_CMD);
+    OneNet_topic_subscribe(onenet, ONENET_TOPIC_DATAPOINT);
+    OneNet_topic_subscribe(onenet, ONENET_TOPIC_CMD);
 
     
     while(1)
@@ -532,13 +531,12 @@ int main(void)
         rt_thread_mdelay(500);
 
         /*上传数据*/
-//        send_len = snprintf(data_point_buf, sizeof(data_point_buf), "{\"id\":%d, \"dp\":{\"csq\":[{\"v\":%d}]}}", i, i); 
-//        i++;
-//        
-//        OneNet_session_send(onenet, data_point_buf, send_len);
-////        gps_rmc_sample_entry(gps_rx);
+        send_len = snprintf(data_point_buf, sizeof(data_point_buf), "{\"id\":%d, \"dp\":{\"csq\":[{\"v\":%d}]}}", i, i); 
+        i++;
+        
+        OneNet_session_send(onenet, data_point_buf, send_len);
 
-//        rt_thread_mdelay(59000);
+        rt_thread_mdelay(59000);
     }    
         
 

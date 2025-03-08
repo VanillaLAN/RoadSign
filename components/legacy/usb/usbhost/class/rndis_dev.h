@@ -15,7 +15,7 @@
 
 #define USB_ETH_MTU                     1500+14
 #define RNDIS_MESSAGE_BUFFER_SIZE       128
-#define RNDIS_INFO_BUFFER_OFFSET        40//20
+#define RNDIS_INFO_BUFFER_OFFSET        20//40//20
 
 #define RESPONSE_AVAILABLE              0x00000001
 

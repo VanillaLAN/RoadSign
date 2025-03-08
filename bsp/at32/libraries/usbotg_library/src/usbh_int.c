@@ -220,7 +220,7 @@ void usbh_hch_in_handler(usbh_core_type *uhost, uint8_t chn)
           uhost->hch[chn].toggle_in ^= 1U; 
         }
       }  
-      rt_kprintf("IN %d URB_DONE recv:%d ,tgl_in:%d at interrupt!\n", chn, uhost->hch[chn].trans_count, uhost->hch[chn].toggle_in);
+      //rt_kprintf("IN %d URB_DONE recv:%d ,tgl_in:%d at interrupt!\n", chn, uhost->hch[chn].trans_count, uhost->hch[chn].toggle_in);
 			
       usbd_notify_urbchange_callback(uhost, chn, uhost->urb_state[chn]);
     }
@@ -230,7 +230,7 @@ void usbh_hch_in_handler(usbh_core_type *uhost, uint8_t chn)
       usbd_notify_urbchange_callback(uhost, chn, uhost->urb_state[chn]);
     }
 
-    rt_kprintf("IN %d XFRC recv:%d\n", chn, uhost->hch[chn].trans_count);
+    //rt_kprintf("IN %d XFRC recv:%d\n", chn, uhost->hch[chn].trans_count);
   }
   else if(hcint_value & USB_OTG_HC_CHHLTD_FLAG)
   {
@@ -250,7 +250,7 @@ void usbh_hch_in_handler(usbh_core_type *uhost, uint8_t chn)
         }
       }
 			uhost->urb_state[chn]  = URB_DONE;
-			rt_kprintf("IN %d URB_DONE recv:%d, tgl_in:%d\n", chn, uhost->hch[chn].trans_count,uhost->hch[chn].toggle_in);
+			//rt_kprintf("IN %d URB_DONE recv:%d, tgl_in:%d\n", chn, uhost->hch[chn].trans_count,uhost->hch[chn].toggle_in);
     }
     else if(uhost->hch[chn].state == HCH_STALL)
     {
@@ -381,7 +381,7 @@ void usbh_hch_out_handler(usbh_core_type *uhost, uint8_t chn)
     {
       uhost->hch[chn].trans_count = uhost->hch[chn].trans_len;
     }
-    rt_kprintf("OUT %d XFRC\n", chn);
+    //rt_kprintf("OUT %d XFRC\n", chn);
   }
   else if( hcint_value & USB_OTG_HC_STALL_FLAG)
   {
@@ -594,13 +594,13 @@ void usbh_rx_qlvl_handler(usbh_core_type *uhost)
           ch->hcchar_bit.chena = TRUE;
           uhost->hch[chn].toggle_in ^= 1;
         }
-				rt_kprintf("IN %d RXQLVL:%d, PID:%d\n", chn, pktcnt, (USB_OTG_GRXSTSP_DPID & tmp) >> 15);
+				//rt_kprintf("IN %d RXQLVL:%d, PID:%d\n", chn, pktcnt, (USB_OTG_GRXSTSP_DPID & tmp) >> 15);
       }
 			else
       {
          /*如果主机接收的包长为最大包长的整数倍，设备最后会发送一个0包长的数据数据表示数据发送完成，这里要对数据包状态进行变化，并且不再使能接收通道*/
          uhost->hch[chn].toggle_in ^= 1U;
-         rt_kprintf("ZIN %d RXQLVL:%d, PID:%d\n", chn, pktcnt, (USB_OTG_GRXSTSP_DPID & tmp) >> 15);     
+         //rt_kprintf("ZIN %d RXQLVL:%d, PID:%d\n", chn, pktcnt, (USB_OTG_GRXSTSP_DPID & tmp) >> 15);     
       }
       break;
     case PKTSTS_IN_TRANSFER_COMPLETE:

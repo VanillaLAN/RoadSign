@@ -31,8 +31,8 @@ extern struct fal_flash_dev nor_flash0;
 /* partition table */
 #define FAL_PART_TABLE                                                             							  \
 {                                                                                 						  	\
-    {FAL_PART_MAGIC_WORD, "firmware",		"at32_onchip",         0, 1024*1024, 0}, \
-    {FAL_PART_MAGIC_WORD,  "download",	"at32_onchip", 1024*1024, 1024*1024, 0}, \
+    {FAL_PART_MAGIC_WORD, "firmware",		"onchip_flash",         0, 1024*1024, 0}, \
+    {FAL_PART_MAGIC_WORD,  "download",	"onchip_flash", 1024*1024, 1024*1024, 0}, \
 }
 //{                                                                                 						  	\
 //    {FAL_PART_MAGIC_WORD,       "bootloader",     "at32_onchip",			0,   				64*1024, 		0}, \
